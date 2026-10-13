@@ -15,6 +15,16 @@ npx skills add nilovelez/wp-agentic-workflow -g -a claude-code
 
 Then open a WordPress plugin repo in Claude Code and say "we're working on a WordPress plugin".
 
+## Update
+
+To update the skills installed globally, including the official ones:
+
+```bash
+npx skills update -g
+```
+
+Updated skills are loaded when a new Claude Code session starts.
+
 ## Approach
 
 - **Official tools and practices.** [WordPress Playground](https://wordpress.org/playground/) and Blueprints for disposable sites, [WordPress Studio](https://developer.wordpress.com/studio/) for a persistent test site, WP-CLI, the WordPress Coding Standards and Plugin Check. It follows what WordPress recommends at the moment, and changes when that changes.
