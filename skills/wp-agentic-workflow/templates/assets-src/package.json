@@ -1,0 +1,13 @@
+{
+	"name": "wporg-assets-src",
+	"private": true,
+	"description": "Sources of the WordPress.org icon, banners and screenshots. Not part of the plugin.",
+	"type": "module",
+	"scripts": {
+		"render": "node render-assets.mjs",
+		"screenshots": "node screenshots.mjs"
+	},
+	"devDependencies": {
+		"playwright-core": "^1.50.0"
+	}
+}

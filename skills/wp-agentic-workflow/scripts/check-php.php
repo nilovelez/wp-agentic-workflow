@@ -1,7 +1,8 @@
 <?php
 /**
- * Checks that the local PHP CLI is ready for WordPress development tools
- * (WP-CLI, Composer, PHP_CodeSniffer with WPCS).
+ * Checks that the local PHP CLI is ready for the PHP tools of a WordPress
+ * plugin: Composer and PHP_CodeSniffer with the WordPress Coding Standards
+ * (and WP-CLI, where it is installed on its own instead of using Studio).
  *
  * Usage: php check-php.php
  * Exit code: 0 if every required check passes, 1 otherwise.

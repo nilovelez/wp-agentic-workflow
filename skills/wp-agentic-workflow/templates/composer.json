@@ -1,0 +1,17 @@
+{
+	"name": "your-vendor/my-plugin",
+	"description": "Development tools for My Plugin. Not part of the plugin package.",
+	"license": "GPL-2.0-or-later",
+	"require-dev": {
+		"wp-coding-standards/wpcs": "^3.0"
+	},
+	"config": {
+		"allow-plugins": {
+			"dealerdirect/phpcodesniffer-composer-installer": true
+		}
+	},
+	"scripts": {
+		"lint": "phpcs",
+		"fix": "phpcbf"
+	}
+}
