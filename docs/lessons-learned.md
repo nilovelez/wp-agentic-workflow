@@ -5,6 +5,35 @@ assumptions. They feed the skill, and an article and a talk about starting
 WordPress development with Claude. Add new ones as they happen, newest
 project first.
 
+## Quevedo (October 2026)
+
+An existing plugin, published for years, analyzed and tested with Playground
+for the first time.
+
+- **Setting the permalink option is not enough.** `setSiteOptions` with
+  `permalink_structure` saved the option but not the rewrite rules, so every
+  pretty URL silently served the home page with a 200. The first round of
+  redirect tests looked fine and proved nothing. Set the structure in a
+  `runPHP` step with `$wp_rewrite->set_permalink_structure()` and
+  `flush_rewrite_rules()`, and check one pretty URL before trusting the rest.
+- **Port 9400 may be taken.** Another session's Playground was already on
+  9400. The new one silently picked a random port while `--site-url` still
+  pointed at 9400, so links went to the other site. Check the port first and
+  pass `--port` together with `--site-url`.
+- **Stopping the background task leaves Playground running.** On Windows,
+  stopping the shell that ran `npx` doesn't stop its `node` children, and the
+  port stays in use. Find them by command line (`--mount-dir ... plugins/<slug>`)
+  and stop them.
+- **WordPress core changes under old plugins.** Since WordPress 6.4, new sites
+  redirect attachment pages to the file before the plugin's own attachment
+  redirect runs. Since 6.1, lists need `core/list-item`, so a block allowlist
+  written with only `core/list` leaves lists with a single item. Test old
+  features against the current WordPress, not the one they were written for.
+- **Read the debug log through the mount.** The log lives in Playground's
+  virtual file system. A throwaway PHP file in the mounted plugin folder that
+  prints `wp-content/debug.log`, deleted right after, is the quickest way to
+  read it.
+
 ## Writing the skill (October 2026)
 
 Turning what was validated on Classic Honeypot for CF7 into a generic skill,
