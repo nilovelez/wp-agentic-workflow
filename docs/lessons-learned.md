@@ -38,6 +38,16 @@ for the first time.
   plugin with language packs on translate.wordpress.org doesn't need it, nor
   its own `languages/` folder; checking the translations API
   (`api.wordpress.org/translations/plugins/1.0/?slug=<slug>`) settled it.
+- **The skill doesn't cover updates through SVN yet.** `release.md` stops at
+  the first submission. Publishing an update needs a command-line `svn`
+  (TortoiseSVN alone doesn't install `svn.exe`), a working copy outside the
+  repo, `trunk/` replaced with the `git archive` of the release tag, a
+  `tags/<version>` copy in the same commit, and the developer's own SVN
+  password for the commit. Write it down once Quevedo 1.5 is published.
+- **Old trunks carry development files.** Quevedo's SVN `trunk/` had
+  `README.md`, `phpcs.xml` and the WordPress.org `assets/` folder, all of
+  them shipped to users. Replacing `trunk/` with the release archive, instead
+  of copying files over it, cleans that up.
 - **Read the debug log through the mount.** The log lives in Playground's
   virtual file system. A throwaway PHP file in the mounted plugin folder that
   prints `wp-content/debug.log`, deleted right after, is the quickest way to
