@@ -29,6 +29,15 @@ for the first time.
   redirect runs. Since 6.1, lists need `core/list-item`, so a block allowlist
   written with only `core/list` leaves lists with a single item. Test old
   features against the current WordPress, not the one they were written for.
+- **Studio updates itself and restarts its sites.** Studio auto-updated
+  (1.23 to 1.24) while a site was running and restarted it. The plugin
+  junction and the activated plugin survived; check the site responds after
+  an update before trusting test results.
+- **Plugin Check found almost nothing after WPCS.** With the full WordPress
+  ruleset clean, Plugin Check only flagged `load_plugin_textdomain()`. A
+  plugin with language packs on translate.wordpress.org doesn't need it, nor
+  its own `languages/` folder; checking the translations API
+  (`api.wordpress.org/translations/plugins/1.0/?slug=<slug>`) settled it.
 - **Read the debug log through the mount.** The log lives in Playground's
   virtual file system. A throwaway PHP file in the mounted plugin folder that
   prints `wp-content/debug.log`, deleted right after, is the quickest way to
