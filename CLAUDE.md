@@ -9,7 +9,7 @@ Everything here was first validated on a real project: [Classic Honeypot for CF7
 - `docs/handoff.md`: everything validated so far (workflows, commands, Windows gotchas, MCP, release, assets, open items). It is the source of truth until the skill is written.
 - `docs/lessons-learned.md`: lessons learned, including dead ends and wrong assumptions. Public; it also feeds an article and a talk about starting WordPress development with Claude. Add new lessons as they happen.
 - `drafts/`: helper scripts and example files taken from Classic Honeypot for CF7. They still have project-specific values; turn them into generic `scripts/` and templates of the skill.
-- `skills/wp-agentic-workflow/`: the skill itself (not written yet). Use the same layout as [WordPress/agent-skills](https://github.com/WordPress/agent-skills) (`SKILL.md`, `references/`, `scripts/`) so it installs the same way: `npx skills add nilovelez/entorno-desarrollo-wp -g -a claude-code`.
+- `skills/wp-agentic-workflow/`: the skill itself (not written yet). Use the same layout as [WordPress/agent-skills](https://github.com/WordPress/agent-skills) (`SKILL.md`, `references/`, `scripts/`) so it installs the same way: `npx skills add nilovelez/wp-agentic-workflow -g -a claude-code`.
 
 ## Principles of the skill
 
