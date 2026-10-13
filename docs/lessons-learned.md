@@ -5,6 +5,46 @@ assumptions. They feed the skill, and an article and a talk about starting
 WordPress development with Claude. Add new ones as they happen, newest
 project first.
 
+## Writing the skill (October 2026)
+
+Turning what was validated on Classic Honeypot for CF7 into a generic skill,
+re-testing each piece on Windows 11.
+
+- **Wrong assumption: blueprints don't work on Studio.** They do.
+  `studio create --blueprint` applies the blueprint even with `--no-start`,
+  `runPHP` steps that load `/wordpress/wp-load.php` included. Activating a
+  plugin that isn't there yet (it is linked afterwards) is skipped without an
+  error, so the planned "apply a blueprint to Studio" script wasn't needed:
+  create with the blueprint, link, activate with `studio wp`. Test the
+  assumption before building the workaround.
+- **Git Bash and Windows tools.** `studio` is a `.bat` file: Git Bash finds it
+  on the PATH but won't run it by name (`studio.bat` works). And Git Bash
+  rewrites `/wordpress/...` arguments into `C:/Program Files/Git/wordpress/...`,
+  which breaks Playground mounts; `MSYS_NO_PATHCONV=1` turns that off. The
+  first project ran these commands from PowerShell, so neither showed up.
+- **Composer and WPCS.** `composer config` fails when there is no
+  `composer.json` yet, and WPCS needs the
+  `dealerdirect/phpcodesniffer-composer-installer` plugin allowed before
+  installing, or PHPCS doesn't find the `WordPress` standard. A
+  `composer.json` template with `allow-plugins` set avoids both.
+- **A fresh PATH needs a fresh shell.** After installing Composer, the
+  already-running Claude Code session still had the old PATH. Call the tool by
+  its full path or restart the session.
+- **Deleting a Studio site with a linked plugin.** `studio delete` moves the
+  site to the trash, and the plugin folder is a link to the repo. Remove the
+  link first (`(Get-Item <link>).Delete()` removes only a junction); tested
+  with the repo intact afterwards.
+- **One source for asset images.** The icon, banners and placeholders all
+  come from HTML pages rendered with the installed Chrome, which replaced a
+  Windows-only PowerShell placeholder script.
+- **What the developer must do goes last.** In the desktop app, text written
+  between tool calls was shown to the developer as a one-line summary, so the
+  Composer install steps never reached them while Claude kept working. When
+  the developer has to act, give the steps in the final message and wait.
+- **Install or explain: ask.** When a tool is missing, the developer decides
+  whether Claude installs it or gives instructions. Installers with a GUI need
+  the developer at the computer anyway.
+
 ## Classic Honeypot for CF7 (October 2026)
 
 The first project: a fork of a classic plugin, taken from development to

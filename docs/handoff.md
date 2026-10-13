@@ -3,7 +3,10 @@
 Everything learned while building and releasing
 [Classic Honeypot for CF7](https://github.com/nilovelez/classic-honeypot-for-cf7)
 (October 2026, Windows 11), written to start this repo without that project's
-context. It is the source of truth until the skill is written.
+context. The skill in `skills/wp-agentic-workflow/` replaced it as the source
+of truth in October 2026; this file stays as the record of what was validated
+first, and some of it was corrected while writing the skill (see the notes
+below and `docs/lessons-learned.md`).
 
 ## Goal and principles
 
@@ -84,7 +87,10 @@ For a test site that stays, with the plugin linked from the repo.
   hosts file triggers a UAC prompt that someone must accept at the PC.
 - Apply the blueprint's steps with WP-CLI (`studio wp --path <site> ...`): the
   blueprint can't be reused as-is because it activates the plugin before the
-  link exists. Open item: a reusable script for this.
+  link exists. **Corrected later:** it can. `studio create --blueprint` applies
+  it without starting the site, and the activation of the not-yet-linked
+  plugin is skipped without an error; activate it after linking
+  (`scripts/studio-site.mjs`).
 - LAN: Studio's proxy (80/443) listens on all interfaces (PHP itself only on
   ::1), so another machine only needs `<LAN IP> <slug>.local` in its hosts file.
 
@@ -138,27 +144,12 @@ is expected. The Windows firewall did not block either workflow.
 
 ## Drafts
 
-In `drafts/`, still with project-specific values:
-
-- `check-php.php`: checks PHP version, php.ini, extensions for WP-CLI /
-  Composer / PHPCS, and prints the php.ini lines to fix.
-- `pg-wp.sh`: WP-CLI against a persisted Playground `start` site. Probably
-  obsolete now that WP-CLI comes from Studio, and its plugin mount is
-  unnecessary once folder = slug.
-- `wporg-screenshots.mjs`: readme screenshots at 1280x800 with `playwright-core`
-  driving the installed Chrome headless (logs in as admin/password). Needs
-  `npm install playwright-core` in its folder.
-- `wporg-placeholders.ps1`: placeholder icon and banner PNGs.
-- `classic-honeypot-for-cf7/`: the blueprint, `.gitattributes` and banner
-  sources of that plugin. The banner needs the plugin icon (`icon_orig.png`),
-  which is not copied here.
+The drafts that were here became the skill's `scripts/` and `templates/`.
+`pg-wp.sh` (WP-CLI on a persisted Playground site) was dropped: WP-CLI comes
+from Studio.
 
 ## Open items
 
-- Script to apply a blueprint's steps to a Studio site (or a Studio-friendly
-  blueprint convention).
-- Decide what the skill installs vs. only checks.
-- Turn the drafts into the skill's `scripts/` and templates.
-- Cross-platform: everything above was validated on Windows 11; macOS/Linux
-  paths (symlinks, hosts, Chrome path) still to test.
+- Cross-platform: everything was validated on Windows 11; macOS/Linux paths
+  (symlinks, hosts, Chrome path) still to test.
 - Themes: only plugins have been tested.
