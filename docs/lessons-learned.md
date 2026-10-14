@@ -52,6 +52,12 @@ for the first time.
   virtual file system. A throwaway PHP file in the mounted plugin folder that
   prints `wp-content/debug.log`, deleted right after, is the quickest way to
   read it.
+- **Moving the repo breaks the Studio junction silently.** The repo had been
+  cloned in the wrong folder and was moved later. The plugin folder in the
+  Studio site was still a junction to the old path, now empty. Clone into the
+  final folder from the start; after a move, recreate the junction
+  (`(Get-Item <link>).Delete()`, then `New-Item -ItemType Junction`) and move
+  Claude's per-project memory, which is keyed by the repo path.
 
 ## Writing the skill (October 2026)
 
