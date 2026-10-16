@@ -21,17 +21,24 @@ Everything here was first validated on a real project: [Classic Honeypot for CF7
 
 ## Conventions of this repo
 
-- Everything in the repo in US English, except `guppy/`.
+- Everything in the repo in US English, `guppy/` included.
 - License: GPLv2 or later (`LICENSE`).
 
-## Estado del proyecto (Guppy)
+## Project status (Guppy)
 
-Todo lo relacionado con Guppy, el gestor de proyectos de Nilo, vive en el directorio `guppy/` de la raíz del repo, separado de los archivos del proyecto. No guardes datos de Guppy fuera de ese directorio ni datos del proyecto dentro de él.
+This project publishes its status to Guppy, Nilo's project manager (https://github.com/manuelstone/guppy). Everything Guppy-related lives in `guppy/`, written in English:
 
-El estado del proyecto está en `guppy/STATUS.md`. Al terminar cualquier sesión que cambie el estado del proyecto:
-1. Actualiza la cabecera de `guppy/STATUS.md` (estado, siguiente_paso, bloqueo, actualizado).
-2. Añade una entrada breve al principio de su Diario.
-3. Incluye el cambio en el commit.
+- `guppy/STATUS.md`: extended status and work log, for agents working on this project. It is never synced anywhere.
+- `guppy/STATUS.json`: public summary, following the status contract (https://github.com/manuelstone/guppy/blob/main/docs/status-contract.md). `.github/workflows/guppy-sync.yml` copies it to Guppy every time it changes on the default branch, and from there it goes to a public website. Never put private information, credentials or secrets in it.
 
-Estados: activo, bloqueado, en-pausa, pendiente, terminado. Si está bloqueado, di qué se espera y de quién.
-No uses CHANGELOG.md para esto: es para usuarios.
+At the end of any session that changes the project status:
+
+1. Update the Status section of `guppy/STATUS.md` and add a brief entry at the top of its Log.
+2. Update `guppy/STATUS.json`: `status`, `status_text`, and `last_update` with `last_update_unix`. Take both dates from a single timestamp: `ts=$(date +%s); date -d "@$ts" '+%Y-%m-%d %H:%M:%S %z'; echo "$ts"` (GNU date; the contract has the macOS and PowerShell versions). If the status did not change, do not touch the dates.
+3. Commit both files with the rest of the session's changes and push to the default branch.
+
+Statuses: `active` (being worked on), `blocked` (waiting for something outside the project), `inactive` (stopped by choice), `planned` (decided, not started), `archived` (closed).
+
+`status_text`: one or two sentences, under 200 characters, plain text. Say where the project stands and what comes next; if blocked, start with what it is waiting for and from whom. Self-contained: no relative dates, name versions and third parties. Rewrite it in full each time; the history goes in the Log.
+
+Do not use CHANGELOG.md for this: it is for users. Do not edit `guppy-sync.yml`. If the Guppy sync action fails, read its log in the Actions tab and tell Nilo.

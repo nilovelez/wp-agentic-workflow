@@ -1,0 +1,12 @@
+{
+  "id": "nilovelez-wp-agentic-workflow",
+  "title": "wp-agentic-workflow",
+  "description": "Public Claude Code skill that sets up and guides a WordPress plugin development workflow, from local test sites to WordPress.org submission.",
+  "status": "active",
+  "status_text": "Version 1 of the skill is merged and was tested on the Quevedo plugin. Next: add the Quevedo lessons (Playground, SVN updates) to the skill and test it on a new plugin.",
+  "last_update": "2026-10-16 08:14:02 +0200",
+  "last_update_unix": 1792131242,
+  "url": "https://github.com/nilovelez/wp-agentic-workflow",
+  "status_url": "https://raw.githubusercontent.com/nilovelez/wp-agentic-workflow/main/guppy/STATUS.md",
+  "icon": null
+}
