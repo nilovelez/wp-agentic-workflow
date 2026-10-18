@@ -180,6 +180,14 @@ WordPress.org submission on Windows 11.
 - **curl against Playground needs cookies.** Playground's auto-login
   redirects to the same URL until the browser keeps its cookie, so plain
   `curl -L` hangs in a loop. Use a cookie jar (`-c jar -b jar`).
+- **The skill didn't load for a small fix.** Asked to harden one line after
+  the review, Claude worked without loading `wp-agentic-workflow`, looked for
+  a global `phpcs` on the PATH, found none and reported "PHPCS is not
+  installed" instead of running `check-env.mjs` and setting up WPCS with
+  Composer from the templates. The repo predated the skill, so step 2 had
+  never been done there. Any change to plugin code, however small, is
+  "continuing work on a plugin": load the skill first. A tool that is
+  missing means "set it up", never "skip the check".
 - **CF7 forms created in a blueprint: embed them by ID.** In a test blueprint,
   `[contact-form-7 id="<hash>"]` showed "Contact form not found"; the numeric
   `$form->id()` worked.
