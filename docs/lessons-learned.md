@@ -191,3 +191,12 @@ WordPress.org submission on Windows 11.
 - **CF7 forms created in a blueprint: embed them by ID.** In a test blueprint,
   `[contact-form-7 id="<hash>"]` showed "Contact form not found"; the numeric
   `$form->id()` worked.
+- **The skill had no SVN step.** It ended at submission, so the first upload
+  was worked out on the spot: checkout in a separate folder with the slug as
+  name, `trunk/` from the `git archive` zip, `svn copy` to the tag, assets
+  with `svn:mime-type`, and the commit left to the developer, who made it
+  with TortoiseSVN. Added to `release.md`.
+- **Check the published plugin, not just the commit.** The plugin API and the
+  `downloads.wordpress.org` zip confirm the version, and a `diff -r` showed
+  the download identical to the `git archive` zip. WordPress.org now delays
+  plugin updates by six hours before sites see them.

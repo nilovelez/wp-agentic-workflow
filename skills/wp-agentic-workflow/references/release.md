@@ -37,6 +37,29 @@ Check its contents (`unzip -l` or open it) before submitting: no development fil
 
 The automated scan runs first; then the plugin waits in the manual review queue (it can take weeks). If the reviewers ask for changes, **reply to their email**; never submit the plugin again.
 
+Several emails can arrive close together: an AI-assisted pre-review ("Let's improve your plugin") and the approval ("Your review has been successfully completed"). Read them all, in order, before acting. Once approved, the slug is final and no reply is needed. Still go through each pre-review finding: fix the real ones in the next version (they will come up again in later reviews) and leave the rest.
+
+## Upload to SVN
+
+WordPress.org hosts plugins in Subversion, used as a release system: only commit versions ready to use. After approval, an email gives the SVN URL (`https://plugins.svn.wordpress.org/<slug>`). The SVN password is not the WordPress.org password: set it in the profile, under "Account & Security". Write access can take up to an hour after the email.
+
+Check out the SVN repository outside the Git repo, in its own folder with the slug as name, never inside the Git working tree:
+
+```bash
+svn checkout https://plugins.svn.wordpress.org/<slug> <svn-folder>/<slug>
+```
+
+For each version, after WPCS and Plugin Check are clean and the release is committed in Git:
+
+1. Build the zip with `git archive` (see above) and extract it.
+2. Replace the contents of `trunk/` with the extracted plugin. `svn add` new files and `svn delete` removed ones.
+3. Copy `assets/` from the Git repo to `assets/` and set `svn:mime-type` on the images (`svn propset svn:mime-type image/png assets/*.png`), so browsers show them instead of downloading them.
+4. Tag the version: `svn copy trunk tags/<version>`. The readme's `Stable tag` must name that tag.
+5. Check `svn status`, and compare `trunk/` and `tags/<version>/` with the zip.
+6. Commit: `svn commit -m "Release <version>"`. It publishes the plugin, so it is the developer's call: prepare everything and give them the message, or commit only when asked.
+
+Afterwards, check that the plugin API (`https://api.wordpress.org/plugins/info/1.2/?action=plugin_information&request[slug]=<slug>`) shows the new version and that `https://downloads.wordpress.org/plugin/<slug>.<version>.zip` matches the zip. WordPress.org can delay updates for a few hours before sites see them.
+
 ## WordPress.org assets
 
 The images of the plugin's page go in an `assets/` folder in the repo root, `export-ignore`d. It is uploaded as is to the `assets/` folder of the plugin's SVN repository:
