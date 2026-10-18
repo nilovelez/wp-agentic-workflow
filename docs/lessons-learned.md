@@ -162,3 +162,24 @@ WordPress.org submission on Windows 11.
   Information" field.
 - **First submission.** The automated scan passed on the first try once Plugin
   Check was clean. The manual review queue had about 243 plugins.
+- **Two emails at once: read them in order.** A new AI-assisted pre-review
+  ("Let's improve your plugin", review ID starting with `AUTOPREREVIEW`) and
+  the approval ("Your review has been successfully completed") arrived minutes
+  apart. Reading only the first one, we started planning a rename and a reply.
+  The approval wins: the slug is fixed and no reply is needed.
+- **The AI pre-review flags more than Plugin Check.** With Plugin Check clean,
+  it still flagged unsanitized CSS from a filter passed to
+  `wp_add_inline_style()`, and raised generic warnings about Guideline 11
+  (just for having `admin_notices`) and about the name. Judge each one: the
+  notices and the name stayed, the CSS was hardened in a point release,
+  since it would come up again in later reviews.
+- **Prove a security fix in Playground.** A test mu-plugin that returns
+  `</style><script>` from the filter showed the payload reaching the page
+  before the fix (recent WordPress already escapes `</style`, older ones don't
+  guarantee it) and gone after it.
+- **curl against Playground needs cookies.** Playground's auto-login
+  redirects to the same URL until the browser keeps its cookie, so plain
+  `curl -L` hangs in a loop. Use a cookie jar (`-c jar -b jar`).
+- **CF7 forms created in a blueprint: embed them by ID.** In a test blueprint,
+  `[contact-form-7 id="<hash>"]` showed "Contact form not found"; the numeric
+  `$form->id()` worked.
