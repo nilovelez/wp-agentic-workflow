@@ -1,6 +1,6 @@
 ---
 name: wp-agentic-workflow
-description: "Use when starting or continuing work on a WordPress plugin repository (\"we're working on a WordPress plugin\"): checks and installs the development tools, sets up test sites (disposable with Playground, persistent with Studio), enforces WordPress coding standards (WPCS, Plugin Check), and takes the plugin to a WordPress.org release (zip, assets, submission). Opinionated glue on top of the official WordPress agent skills."
+description: "Use for any work on a WordPress plugin repository, however small: starting or continuing development (\"we're working on a WordPress plugin\"), a one-line fix, addressing a WordPress.org review, or preparing a new version. Load it before changing plugin code. It checks and installs the development tools, sets up test sites (disposable with Playground, persistent with Studio), enforces WordPress coding standards (WPCS, Plugin Check), and takes the plugin to a WordPress.org release (zip, assets, submission). Opinionated glue on top of the official WordPress agent skills."
 compatibility: "WordPress plugins (themes not covered yet). Node.js 20.18+, WordPress Studio CLI, PHP 7.4+ and Composer. Validated on Windows 11; macOS and Linux untested."
 ---
 
