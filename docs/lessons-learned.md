@@ -44,6 +44,26 @@ for the first time.
   repo, `trunk/` replaced with the `git archive` of the release tag, a
   `tags/<version>` copy in the same commit, and the developer's own SVN
   password for the commit. Write it down once Quevedo 1.5 is published.
+- **The first SVN update, done by Claude step by step.** Quevedo 1.5 went out
+  with Claude running every step, the commit included, and the developer
+  confirming each one before it ran. A sparse checkout (`--depth immediates`,
+  then `trunk/` and `assets/` at full depth and `tags/` empty) avoids
+  downloading every old tag and still allows `svn cp trunk tags/<version>`.
+  Check that the tag doesn't exist remotely (`svn ls .../tags/`) and compare
+  the root `assets/` with the repo's by hash before touching it.
+- **SVN credentials may or may not be cached.** The `svn.exe` from
+  TortoiseSVN's command-line tools shares its credential store, so a password
+  once saved by TortoiseSVN let the commit run without asking for it. That
+  can't be assumed: check with `svn auth plugins.svn.wordpress.org` before the
+  commit, and if nothing is cached, the developer enters their SVN password
+  (or makes the commit). Never ask for it in the chat.
+- **The same PowerShell pipe trap, again.** Listing the release with
+  `git archive v1.5 | tar -t` failed with a malformed header, just as on the
+  first project. Use `git archive --format=zip -o <file>` from the start.
+- **The plugin API lags the commit.** Right after the commit the API still
+  reported 1.4; it switched to 1.5 a few minutes later. Wait for it in a
+  background loop before downloading the zip and comparing it with the
+  `git archive` of the tag.
 - **Old trunks carry development files.** Quevedo's SVN `trunk/` had
   `README.md`, `phpcs.xml` and the WordPress.org `assets/` folder, all of
   them shipped to users. Replacing `trunk/` with the release archive, instead
