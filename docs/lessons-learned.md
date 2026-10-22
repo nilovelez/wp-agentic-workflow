@@ -5,6 +5,20 @@ assumptions. They feed the skill, and an article and a talk about starting
 WordPress development with Claude. Add new ones as they happen, newest
 project first.
 
+## WordPress.tv 27 (October 2026)
+
+An external review (coding standards, security, feature parity) of a block
+theme that other agents are developing at the same time.
+
+- **The scripts assume a plugin.** `check-env.mjs` fails its last check
+  because it looks for a root file with a `Plugin Name:` header, and
+  `studio-site.mjs` stops for the same reason. Everything else applies to a
+  theme with small changes: link the repo into `wp-content/themes/<slug>`
+  instead of `plugins/`, activate it with `theme activate`, mount it under
+  `/wordpress/wp-content/themes/<slug>` in Playground, and drop the
+  `activatePlugin` step from the blueprint. The Studio site was created by
+  hand with those changes.
+
 ## Quevedo (October 2026)
 
 An existing plugin, published for years, analyzed and tested with Playground
