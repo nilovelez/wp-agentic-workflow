@@ -5,6 +5,33 @@ assumptions. They feed the skill, and an article and a talk about starting
 WordPress development with Claude. Add new ones as they happen, newest
 project first.
 
+## Shell on Windows (October 2026)
+
+Found while working on a plain PHP project, but it applies to any project on
+Windows where the agent runs commands through Claude Code.
+
+- **The Bash tool halves backslashes.** On Windows, Claude Code's Bash tool
+  (Git Bash) loses half the backslashes before bash sees the command:
+  `echo 'a\\b'` prints `a\b`, even in single quotes, and a quoted heredoc
+  (`<<'EOF'`) does the same. It looked like a Git Bash problem and wasn't:
+  bash 5.3 has no rc files, no `BASH_ENV`, and `posix` and `xpg_echo` are
+  off, the same text run from a `.sh` file keeps its backslashes, and
+  reinstalling Git (2.55 to 2.56) changed nothing. The loss happens in how
+  the tool hands the command to bash. Reported to Anthropic.
+- **What to do instead.** Create files with the Write and Edit tools, never
+  with `echo` or heredocs. For a helper script, write it to a file and run it
+  with its path. The PowerShell tool passes the same text intact. A tell-tale
+  sign of the bug is the agent running a command, seeing it fail or write a
+  broken file, and repeating it in PowerShell.
+- **PowerShell adds a trailing CRLF.** `Set-Content` and `Out-File` end the
+  file with CRLF even on text that was LF. For exact bytes use
+  `[IO.File]::WriteAllText` with `New-Object Text.UTF8Encoding($false)`.
+- **Line endings.** In the Git for Windows installer, "Checkout as-is,
+  commit Unix-style line endings" (`core.autocrlf=input`) keeps checked-out
+  files untouched and stops CRLF from entering commits. A `.gitattributes`
+  with `* text=auto eol=lf` in the repo is more robust because it doesn't
+  depend on how Git was installed.
+
 ## WordPress.tv 27 (October 2026)
 
 An external review (coding standards, security, feature parity) of a block
