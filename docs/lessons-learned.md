@@ -38,6 +38,8 @@ and that started as a static HTML page before becoming a plugin.
   `-export-ignore` line per icon in use. `git archive` honors the override.
   A script regenerates that block, and the `.gitattributes` must be committed
   before `git archive`, which reads it from the commit.
+- **Script modules in wp-admin need WordPress 6.6.** In 6.5 they only load
+  on the front end. Set `Requires at least: 6.6` and `minimum_wp_version` 6.6.
 
 ## Shell on Windows (October 2026)
 
