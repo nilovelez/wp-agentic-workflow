@@ -5,6 +5,25 @@ assumptions. They feed the skill, and an article and a talk about starting
 WordPress development with Claude. Add new ones as they happen, newest
 project first.
 
+## Cute WP Badges (October 2026)
+
+A plugin that will only live on GitHub, never in the WordPress.org directory,
+and that started as a static HTML page before becoming a plugin.
+
+- **`assets/` clashes with the plugin's own files.** The skill reserves
+  `assets/` for the WordPress.org page images and `export-ignore`s it. This
+  project already kept its runtime files there (SVG icons, a local copy of
+  Dashicons), which must be in the zip. For a plugin that is not published on
+  WordPress.org there are no directory assets, so `assets/` stayed as runtime
+  files and was not excluded. The templates assume every plugin goes to the
+  directory; the skill could say what to do when it doesn't, or suggest
+  another folder name for runtime assets.
+- **Don't start test servers unasked.** The agent started a local web server
+  to share a static preview page; the developer could open the file directly
+  through remote desktop and did not want it. Only start a site when asked.
+- **Don't push unasked.** "Merge it so I can see the code" was read as
+  "merge and push". It was not.
+
 ## Shell on Windows (October 2026)
 
 Found while working on a plain PHP project, but it applies to any project on
