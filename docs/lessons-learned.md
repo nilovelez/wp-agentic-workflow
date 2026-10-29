@@ -10,14 +10,13 @@ project first.
 A plugin that will only live on GitHub, never in the WordPress.org directory,
 and that started as a static HTML page before becoming a plugin.
 
-- **`assets/` clashes with the plugin's own files.** The skill reserves
-  `assets/` for the WordPress.org page images and `export-ignore`s it. This
-  project already kept its runtime files there (SVG icons, a local copy of
-  Dashicons), which must be in the zip. For a plugin that is not published on
-  WordPress.org there are no directory assets, so `assets/` stayed as runtime
-  files and was not excluded. The templates assume every plugin goes to the
-  directory; the skill could say what to do when it doesn't, or suggest
-  another folder name for runtime assets.
+- **Keep `assets/` for the directory, always.** The project had put its
+  runtime files (SVG icons, a local copy of Dashicons) in `assets/` while it
+  was still a static page. When it became a plugin, the agent kept them there
+  and dropped the `export-ignore`, reasoning that a plugin not published on
+  WordPress.org has no directory assets. Wrong: a GitHub-only plugin may go
+  to the directory later. The runtime files moved to `resources/`, and
+  `assets/` stays reserved and excluded from the zip from day one.
 - **Don't start test servers unasked.** The agent started a local web server
   to share a static preview page; the developer could open the file directly
   through remote desktop and did not want it. Only start a site when asked.
