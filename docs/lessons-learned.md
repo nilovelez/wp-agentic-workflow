@@ -22,6 +22,22 @@ and that started as a static HTML page before becoming a plugin.
   through remote desktop and did not want it. Only start a site when asked.
 - **Don't push unasked.** "Merge it so I can see the code" was read as
   "merge and push". It was not.
+- **Headless Chrome `--dump-dom` is unreliable for async code.** To test a
+  JavaScript module in a real browser, the agent loaded a test page with
+  `chrome --headless=new --dump-dom`. With asynchronous work (fetch, image
+  decoding, `canvas.toBlob`) it dumped the page at different points on each
+  run, with or without `--virtual-time-budget` or `--timeout`, which looked
+  like a hang in the code under test. What works: start Chrome with
+  `--remote-debugging-port`, connect to the page's WebSocket from Node (Node
+  22+ has `WebSocket` built in) and poll `Runtime.evaluate` until the page
+  reports it is done. ES modules need the page served over HTTP, not
+  `file://`.
+- **Keep only the icons in use in the zip.** The plugin keeps the whole
+  Dashicons set as SVG files in the repo but ships only the ones it uses:
+  `/resources/icons/dashicons/*.svg export-ignore`, then one
+  `-export-ignore` line per icon in use. `git archive` honors the override.
+  A script regenerates that block, and the `.gitattributes` must be committed
+  before `git archive`, which reads it from the commit.
 
 ## Shell on Windows (October 2026)
 
