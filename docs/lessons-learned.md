@@ -215,11 +215,6 @@ releasing on GitHub and WordPress.org, with the developer away.
   `git diff --no-index --stat` on the two folders. Then grep the plugin for
   every API of the dependency it uses and read only the diffs that could touch
   them.
-- **`studio site start` needs someone at the desk.** It asks for UAC
-  permission to edit the hosts file even when the entries are already there.
-  Unattended, the prompt goes unanswered and the site stays offline, so the
-  functional test moved to Playground, which needs no permissions. WP-CLI
-  through `studio wp` works with the site stopped.
 - **Test with HTTP requests, not a browser.** Read the hidden fields from the
   form page and post to Contact Form 7's REST endpoint
   (`/wp-json/contact-form-7/v1/contact-forms/<id>/feedback`): one call per
