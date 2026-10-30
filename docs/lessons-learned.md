@@ -203,6 +203,38 @@ re-testing each piece on Windows 11.
 The first project: a fork of a classic plugin, taken from development to
 WordPress.org submission on Windows 11.
 
+### Maintenance release (1.0.2)
+
+Checking the plugin against new WordPress and Contact Form 7 releases, then
+releasing on GitHub and WordPress.org, with the developer away.
+
+- **Diff the dependency, don't trust its changelog.** Contact Form 7's
+  changelog only links to release posts, and contactform7.com refuses
+  automated fetches. What worked: copy the installed plugin folder from the
+  Studio site, update it with `studio wp plugin update`, and run
+  `git diff --no-index --stat` on the two folders. Then grep the plugin for
+  every API of the dependency it uses and read only the diffs that could touch
+  them.
+- **`studio site start` needs someone at the desk.** It asks for UAC
+  permission to edit the hosts file even when the entries are already there.
+  Unattended, the prompt goes unanswered and the site stays offline, so the
+  functional test moved to Playground, which needs no permissions. WP-CLI
+  through `studio wp` works with the site stopped.
+- **Test with HTTP requests, not a browser.** Read the hidden fields from the
+  form page and post to Contact Form 7's REST endpoint
+  (`/wp-json/contact-form-7/v1/contact-forms/<id>/feedback`): one call per
+  case (human, honeypot filled, too fast, future start, missing start) and the
+  `status` field says `mail_sent` or `spam`. For admin pages, log in with
+  `curl -c/-b` and a cookie jar: PowerShell's `WebRequestSession` drops the
+  `/wp-admin` auth cookie when WordPress sends several `Set-Cookie` headers,
+  and every admin page redirects to the login.
+- **Run Plugin Check on the extracted zip.** On the repo folder it flags
+  `.claude`, `.github`, `CLAUDE.md` and untracked folders (here, a local copy
+  of the original plugin in `code-reference/`), which never reach the zip.
+  `studio wp plugin check <path>` accepts a folder outside the site.
+- **`gh release create --target` needs the full SHA.** A short SHA fails with
+  `Release.target_commitish is invalid`.
+
 ### Development environment
 
 - **Two machines.** Claude and the dev environment ran on one machine on the
