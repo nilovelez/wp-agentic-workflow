@@ -23,6 +23,36 @@ A plugin that turns CampTix CSV exports into printable PDF badges.
 - **The agent's GitHub account may not be able to rename the repo.** `gh`
   was logged in as a collaborator without admin rights, so the developer has
   to rename it in Settings. Check `permissions.admin` before promising it.
+- **A sandbox of the host platform beats mocking it.** To test against
+  CampTix, the blueprint installs the real plugin from one folder of the
+  `WordPress/wordcamp.org` repo (`git:directory`, pinned to a commit), and a
+  must-use plugin stands in for the three WordCamp.org functions it calls
+  and creates invented data. Comparing CampTix's own CSV export with the
+  plugin's live reading then proved both paths give identical results.
+- **Seeding on the first request races in Playground.** The CLI serves with
+  six workers and the first page load fires several requests, so a "seed if
+  not done" check ran twice and duplicated every post. `add_option()` as a
+  lock (it fails if the row exists) lets only one request seed.
+- **Invented posts need past dates.** Purchase dates generated forward from
+  a start date ran past "now", and WordPress saved those posts as
+  `future` (Scheduled) instead of `publish`.
+- **Save the post again after adding its meta, like the host plugin does.**
+  CampTix builds the attendee title and search content on `save_post`, so
+  posts inserted first and given meta afterwards showed "(no title)" until
+  `wp_update_post()` ran once more, as CampTix itself does at checkout.
+- **Multisite-only code shows up on a single site.** WordCamp.org is a
+  network: CampTix's export uses `WP_Site` and a T-shirt cron job uses
+  `get_sites()`, which only exist on multisite. The class can be loaded and
+  the site primed in the `sites` cache group; the network-wide add-on was
+  turned off.
+- **Read Playground's PHP log from the host.** The site's files live inside
+  Playground, so `WP_DEBUG_LOG` was pointed at a path inside the mounted
+  plugin folder (`sandbox/debug.log`, ignored by Git). Warnings also reached
+  the page even with `WP_DEBUG_DISPLAY` off, and broke a CSV download.
+- **A bare `phpcs:enable` re-enables everything.** After a
+  `phpcs:disable` for one sniff, a later `// phpcs:enable` with no sniff
+  name turned back on rules disabled at the top of the file. Name the sniff
+  in both.
 
 - **On Tailscale, use the Tailscale IP, not the LAN IP.** The agent started
   Playground with `--site-url http://<LAN IP>:9400`, as the skill says. The
