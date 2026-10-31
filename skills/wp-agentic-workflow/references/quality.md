@@ -12,6 +12,8 @@ Set up once per repo, with Composer as a development dependency:
 
 `composer.json` must allow the `dealerdirect/phpcodesniffer-composer-installer` plugin before installing (the template does): it registers WPCS with PHPCS. Without it, `phpcs -i` doesn't list `WordPress`.
 
+A repo that predates this setup has no WPCS yet: set it up as above. A missing tool means "set it up", never "skip the check".
+
 Run it:
 
 ```bash
@@ -27,13 +29,24 @@ Fix the code, don't silence the rule. When a rule must be ignored, ignore that o
 
 ## Plugin Check
 
-The official tool of the WordPress.org plugin review team. Run it on the Studio site, where the plugin is linked:
+The official tool of the WordPress.org plugin review team. Run it on what reviewers will get, the release zip, not on the repo: on the repo folder it also flags development files (`.git`, `.claude`, `.github`, `CLAUDE.md`, untracked folders) that never reach the zip.
+
+It needs a WordPress site with Plugin Check installed, but the site doesn't need to be running, and the plugin doesn't need to be installed in it: `plugin check` accepts a folder path. Use the Studio site:
 
 ```bash
 studio wp --path <site> plugin install plugin-check --activate
-studio wp --path <site> plugin check <slug> --include-experimental --exclude-directories=<dev dirs> --exclude-files=<dev files>
 ```
 
-Plugin Check only takes a slug, and on a linked site that slug is the whole repo, development files included (it even flags `.git` and `.claude`). Exclude everything that is `export-ignore` in `.gitattributes`: folders in `--exclude-directories` (`.git`, `.claude`, `vendor`, `assets`, `assets-src`...) and files in `--exclude-files` (`.gitignore`, `.gitattributes`, `blueprint.json`, `composer.json`, `composer.lock`, `phpcs.xml.dist`, `README.md`, `CLAUDE.md`...). Then check the release zip itself (see `release.md`): only the files in it are what reviewers see.
+Then, from the repo root, build the zip (see `release.md`), extract it to a temporary folder outside the repo, and check that folder:
+
+```bash
+git archive --format=zip --prefix=<slug>/ -o <temp>/<slug>.zip HEAD
+# Extract <temp>/<slug>.zip into <temp> (Expand-Archive on Windows, unzip elsewhere).
+studio wp --path <site> plugin check <temp>/<slug> --include-experimental
+```
+
+`git archive` takes committed files only: commit first.
+
+With WPCS clean, Plugin Check usually finds little. A common one: `load_plugin_textdomain()` is not needed for a plugin hosted on WordPress.org (see "Translations" in `release.md`).
 
 For the plugin's code itself (security, Settings API, lifecycle), see the official `wp-plugin-development` skill. For the directory rules (licensing, naming, trialware), `wp-plugin-directory-guidelines`.

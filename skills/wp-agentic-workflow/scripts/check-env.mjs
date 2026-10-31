@@ -43,6 +43,11 @@ const installHints = {
 		darwin: 'brew install composer',
 		linux: 'Follow https://getcomposer.org/download/ (or: sudo apt install composer)',
 	},
+	svn: {
+		win32: 'winget install --id TortoiseSVN.TortoiseSVN -e, choosing "command line client tools" in the installer (they are not installed by default)',
+		darwin: 'brew install subversion',
+		linux: 'sudo apt install subversion',
+	},
 	chrome: {
 		win32: 'winget install --id Google.Chrome -e (or set CHROME_PATH to another Chromium browser)',
 		darwin: 'Install Google Chrome (or set CHROME_PATH to another Chromium browser)',
@@ -167,6 +172,10 @@ const phpOk = null !== phpVersion && isAtLeast( phpVersion, '7.4.0' );
 addCheck( 'php', 'PHP CLI', true, phpOk, phpVersion ? phpVersion + ( phpOk ? '' : ' (needs 7.4 or later)' ) : 'not found' );
 const composerVersion = findVersion( run( 'composer --version --no-ansi' ) );
 addCheck( 'composer', 'Composer', true, null !== composerVersion, composerVersion || 'not found' );
+
+// Subversion: only for publishing on WordPress.org.
+const svnVersion = findVersion( run( 'svn --version --quiet' ) );
+addCheck( 'svn', 'Subversion', false, null !== svnVersion, svnVersion || 'not found (only needed to publish on WordPress.org)' );
 
 // Chrome: only for WordPress.org screenshots and banners.
 const chrome = findChrome();

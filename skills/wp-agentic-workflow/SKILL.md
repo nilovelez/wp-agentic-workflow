@@ -44,20 +44,24 @@ Adapt them to the plugin (slug, text domain, prefix, dependencies). Don't overwr
 
 Two kinds, both with login `admin` / `password`:
 
-- **Playground**, disposable, for day-to-day development: `references/playground.md`.
-- **Studio**, persistent, with the plugin linked from the repo: for data that must survive, WP-CLI, Plugin Check, screenshots and the MCP Adapter. `references/studio.md` and, optionally, `references/mcp-adapter.md`.
+- **Playground**, disposable, for day-to-day development and most testing: `references/playground.md`.
+- **Studio**, persistent, with the plugin linked from the repo. WP-CLI and Plugin Check run on it with the site stopped. **Start it only when something needs testing that Playground can't cover** (persistent data, a fixed domain, the MCP Adapter...). `references/studio.md` and, optionally, `references/mcp-adapter.md`.
 
-**Always say where the test site is.** The developer is often at another computer, not the one running Claude Code. Every time a site is up, give its URL and, for a Studio domain, the hosts line for other computers with this computer's current LAN IP (check it each time):
+**Always say where the test site is.** The developer is often at another computer, not the one running Claude Code. Get this computer's address with `node <skill>/scripts/site-address.mjs` every time a site starts (the Tailscale IP if Tailscale is running, otherwise the LAN IP). Give the site's URL and, for a Studio domain, the hosts line for other computers:
 
-> The test site is at http://my-plugin.local/ (admin / password). From another computer on this network, add `192.168.1.20 my-plugin.local` to its hosts file.
+> The test site is at http://my-plugin.local/ (admin / password). From another computer, add `100.101.102.103 my-plugin.local` to its hosts file.
 
-### 4. Quality
+### 4. Test
 
-Before every commit that touches PHP: `composer lint`. Before any release: Plugin Check on the Studio site. Details in `references/quality.md`.
+Test changes on a running site before handing them over, with HTTP requests or a headless browser, and report measured results: `references/testing.md`. It also covers proving security fixes, reading the debug log and checking the plugin against new WordPress and dependency releases.
 
-### 5. Release
+### 5. Quality
 
-Zip with `git archive`, readme checks, WordPress.org assets and submission: `references/release.md`. Review the directory rules with the official `wp-plugin-directory-guidelines` skill.
+Before every commit that touches PHP: `composer lint`. Before any release: Plugin Check on the extracted release zip. Details in `references/quality.md`.
+
+### 6. Release
+
+Zip with `git archive`, readme checks, WordPress.org assets, submission and each version's upload to SVN: `references/release.md`. Review the directory rules with the official `wp-plugin-directory-guidelines` skill.
 
 ## Official skills this builds on
 

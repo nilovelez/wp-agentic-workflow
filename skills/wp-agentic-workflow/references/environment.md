@@ -21,7 +21,8 @@ It checks:
 | Studio CLI (`studio`) | Persistent test site, WP-CLI (`studio wp`) | Yes (not available on Linux) |
 | PHP CLI 7.4+ | Composer and PHPCS | Yes |
 | Composer | WordPress Coding Standards (PHPCS) | Yes |
-| Chrome | WordPress.org screenshots and banners | No |
+| Subversion (`svn`) | Publishing on WordPress.org | No |
+| Chrome | WordPress.org screenshots and banners, headless browser tests | No |
 | Plugin folder | Folder name = plugin slug (Text Domain) | Yes |
 
 For PHP, also run `php <skill>/scripts/check-php.php`: it checks the version, `php.ini`, the extensions Composer and PHPCS need, and prints the `php.ini` lines to fix.
@@ -44,6 +45,7 @@ Install commands:
 | Studio | Installer from <https://developer.wordpress.com/studio/> | Same | Not available: Playground only, and WP-CLI from <https://wp-cli.org/> |
 | PHP | `winget install --id PHP.PHP.NTS.8.4 -e`, then `check-php.php` | `brew install php` | `sudo apt install php-cli php-curl php-mbstring php-xml php-zip` |
 | Composer | <https://getcomposer.org/Composer-Setup.exe> (pick the PHP above, add to PATH) | `brew install composer` | <https://getcomposer.org/download/> |
+| Subversion | `winget install --id TortoiseSVN.TortoiseSVN -e`, choosing "command line client tools" in the installer | `brew install subversion` | `sudo apt install subversion` |
 | Chrome | `winget install --id Google.Chrome -e` | Installer | `google-chrome` or `chromium` package |
 
 After installing, a new terminal is needed to pick up the new PATH. Tools started from an already running session (including Claude Code's shell) may still have the old PATH: call the tool by its full path (for example `C:\ProgramData\ComposerSetup\bin\composer.bat`) or restart the session.
@@ -53,6 +55,14 @@ After installing, a new terminal is needed to pick up the new PATH. Tools starte
 The repo folder must be named exactly like the plugin slug (the Text Domain, usually also the main file name). Mounting or linking a folder under another name needs fragile paths, especially on Windows. If it doesn't match, stop and give rename instructions: close the editor and Claude Code, rename the folder, open it again. Renaming the remote repo to match is recommended, not required.
 
 ## Windows shells
+
+In Claude Code on Windows, prefer the PowerShell tool to the Bash tool. The Bash tool (Git Bash) loses half the backslashes of a command before bash sees it, even in single quotes and quoted heredocs: Windows paths and regular expressions break, and files written with `echo` or `cat <<'EOF'` come out wrong. The PowerShell tool passes the text intact.
+
+- **Create and edit files with the Write and Edit tools**, never with `echo`, heredocs or `Set-Content`. For a helper script, write it to a file and run it by its path.
+- **`Set-Content` and `Out-File` end the file with CRLF**, even on LF text. For exact contents use `[IO.File]::WriteAllText(<path>, <text>, (New-Object Text.UTF8Encoding($false)))`.
+- **Line endings**: the `.gitattributes` template (`* text=auto eol=lf`) keeps LF in the repo whatever Git's `core.autocrlf` is.
+
+If you do use Git Bash:
 
 - **Git Bash can't run `studio` by name**: it is a `.bat` file. Use `studio.bat` in Git Bash, or PowerShell.
 - **Git Bash rewrites Unix-looking arguments into Windows paths**: `/wordpress/...` becomes `C:/Program Files/Git/wordpress/...`. Prefix Playground commands with `MSYS_NO_PATHCONV=1`, or use PowerShell.

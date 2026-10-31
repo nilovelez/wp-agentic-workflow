@@ -4,7 +4,20 @@
 
 The repo holds only the plugin plus its configuration and development files. Development files are kept out of the release zip with `export-ignore` in `.gitattributes` (start from `templates/gitattributes` and add any other development file or folder).
 
-Translations: plugins hosted on WordPress.org are translated on translate.wordpress.org. They don't need a `languages/` folder or a `Domain Path` header. To check the strings, generate a POT without a site:
+`git archive` reads `.gitattributes` from the commit it archives: commit changes to it before building the zip.
+
+To ship only part of an ignored folder, ignore the folder and then un-ignore what ships, one line per path:
+
+```
+/resources/icons/*.svg export-ignore
+/resources/icons/arrow.svg -export-ignore
+```
+
+`assets/` is reserved for the WordPress.org images (see below) and always `export-ignore`d, even for a plugin that is only on GitHub today: it may go to the directory later. Files the plugin uses at runtime (icons, images, fonts) go in another folder, such as `resources/`.
+
+## Translations
+
+Plugins hosted on WordPress.org are translated on translate.wordpress.org and get language packs from there. They don't need a `languages/` folder, a `Domain Path` header or a `load_plugin_textdomain()` call. To see whether a plugin already has language packs: `https://api.wordpress.org/translations/plugins/1.0/?slug=<slug>`. To check the strings, generate a POT without a site:
 
 ```bash
 studio wp --studio-no-path i18n make-pot . <slug>.pot
@@ -22,7 +35,7 @@ git archive --format=zip --prefix=<slug>/ -o <slug>-<version>.zip HEAD
 
 - Only committed files are included: commit first.
 - `export-ignore` paths are left out.
-- In PowerShell, always write to a file with `-o`: piping binary output corrupts it.
+- In PowerShell, always write to a file with `-o`: piping binary output corrupts it (`git archive | tar -t` fails with a malformed header).
 
 Check its contents (`unzip -l` or open it) before submitting: no development files, nothing missing.
 
@@ -43,22 +56,33 @@ Several emails can arrive close together: an AI-assisted pre-review ("Let's impr
 
 WordPress.org hosts plugins in Subversion, used as a release system: only commit versions ready to use. After approval, an email gives the SVN URL (`https://plugins.svn.wordpress.org/<slug>`). The SVN password is not the WordPress.org password: set it in the profile, under "Account & Security". Write access can take up to an hour after the email.
 
-Check out the SVN repository outside the Git repo, in its own folder with the slug as name, never inside the Git working tree:
+It needs a command-line `svn` (see `environment.md`). On Windows, TortoiseSVN alone is not enough: its command-line tools are an option of its installer, not installed by default.
+
+Check out the SVN repository outside the Git repo, in its own folder with the slug as name, never inside the Git working tree. For a plugin with many versions, a sparse checkout avoids downloading every old tag and still allows tagging:
 
 ```bash
-svn checkout https://plugins.svn.wordpress.org/<slug> <svn-folder>/<slug>
+svn checkout --depth immediates https://plugins.svn.wordpress.org/<slug> <svn-folder>/<slug>
+cd <svn-folder>/<slug>
+svn update --set-depth infinity trunk assets
 ```
 
 For each version, after WPCS and Plugin Check are clean and the release is committed in Git:
 
-1. Build the zip with `git archive` (see above) and extract it.
-2. Replace the contents of `trunk/` with the extracted plugin. `svn add` new files and `svn delete` removed ones.
-3. Copy `assets/` from the Git repo to `assets/` and set `svn:mime-type` on the images (`svn propset svn:mime-type image/png assets/*.png`), so browsers show them instead of downloading them.
-4. Tag the version: `svn copy trunk tags/<version>`. The readme's `Stable tag` must name that tag.
-5. Check `svn status`, and compare `trunk/` and `tags/<version>/` with the zip.
-6. Commit: `svn commit -m "Release <version>"`. It publishes the plugin, so it is the developer's call: prepare everything and give them the message, or commit only when asked.
+1. Check that the tag doesn't exist yet: `svn ls https://plugins.svn.wordpress.org/<slug>/tags/`.
+2. Build the zip with `git archive` (see above) and extract it.
+3. Replace the contents of `trunk/` with the extracted plugin: delete everything in `trunk/` and copy the release in, don't copy over the old files. Old trunks often carry development files (`README.md`, `phpcs.xml`, even an `assets/` folder) that reach users; replacing cleans them up. `svn add` new files and `svn delete` removed ones.
+4. Compare the repo's `assets/` with the SVN `assets/` (by file hash). If they differ, copy the repo's over and set `svn:mime-type` on new images (`svn propset svn:mime-type image/png assets/*.png`), so browsers show them instead of downloading them.
+5. Tag the version: `svn copy trunk tags/<version>`. The readme's `Stable tag` must name that tag.
+6. Check `svn status`, and compare `trunk/` and `tags/<version>/` with the zip.
+7. Commit: `svn commit -m "Release <version>"`. It publishes the plugin, so it is the developer's call: prepare everything, show what will be committed, and commit only when they say so, or give them the command.
 
-Afterwards, check that the plugin API (`https://api.wordpress.org/plugins/info/1.2/?action=plugin_information&request[slug]=<slug>`) shows the new version and that `https://downloads.wordpress.org/plugin/<slug>.<version>.zip` matches the zip. WordPress.org can delay updates for a few hours before sites see them.
+The commit needs the developer's SVN password. It may be cached (the `svn` from TortoiseSVN shares its credential store): check with `svn auth plugins.svn.wordpress.org` before committing. If nothing is cached, the developer enters it in a terminal or makes the commit. Never ask for the password in the chat.
+
+Afterwards, check the published plugin, not just the commit:
+
+- The plugin API (`https://api.wordpress.org/plugins/info/1.2/?action=plugin_information&request[slug]=<slug>`) shows the new version. It lags the commit by a few minutes: wait for it in a loop.
+- `https://downloads.wordpress.org/plugin/<slug>.<version>.zip` has the same files as the `git archive` zip (`diff -r` on both, extracted).
+- WordPress.org then delays updates for about six hours before sites see them.
 
 ## WordPress.org assets
 
