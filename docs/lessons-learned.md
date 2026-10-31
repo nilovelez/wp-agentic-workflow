@@ -5,6 +5,18 @@ assumptions. They feed the skill, and an article and a talk about starting
 WordPress development with Claude. Add new ones as they happen, newest
 project first.
 
+## Camptix Badge Generator (October 2026)
+
+A plugin that turns CampTix CSV exports into printable PDF badges.
+
+- **On Tailscale, use the Tailscale IP, not the LAN IP.** The agent started
+  Playground with `--site-url http://<LAN IP>:9400`, as the skill says. The
+  developer reaches the development computer through Tailscale, so the site
+  has to be started with the Tailscale address (`tailscale ip -4`, a
+  `100.x.y.z` address), and the same address goes in the hosts line for a
+  Studio domain. The skill should detect Tailscale (a `Tailscale` network
+  interface, or `tailscale ip -4` answering) and prefer that address.
+
 ## Cute WP Badges (October 2026)
 
 A plugin that will only live on GitHub, never in the WordPress.org directory,
