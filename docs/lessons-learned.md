@@ -5,9 +5,24 @@ assumptions. They feed the skill, and an article and a talk about starting
 WordPress development with Claude. Add new ones as they happen, newest
 project first.
 
-## Camptix Badge Generator (October 2026)
+## Camptix Badge Generator, now CampTix Badge Designer (October 2026)
 
 A plugin that turns CampTix CSV exports into printable PDF badges.
+
+- **Search for the name before picking the slug, beyond WordPress.org.** The
+  plugin was named Camptix Badge Generator, `camptix-badge-generator`, and
+  seven milestones later the agent found a plugin with exactly that name and
+  folder in `WordPress/wordcamp.org`, the code WordCamp sites run, which is
+  where this plugin was meant to go. CampTix and its add-ons left the plugin
+  directory for that repo, so a directory search would not have shown it.
+  Renaming the slug, text domain and prefix across 35 files took a scripted
+  search and replace, a rebuild and a test, but the GitHub repo, the local
+  folder, the Studio site and the Guppy entry all had to follow. Before
+  setting the slug, search GitHub and the ecosystem the plugin is for, not
+  just the directory.
+- **The agent's GitHub account may not be able to rename the repo.** `gh`
+  was logged in as a collaborator without admin rights, so the developer has
+  to rename it in Settings. Check `permissions.admin` before promising it.
 
 - **On Tailscale, use the Tailscale IP, not the LAN IP.** The agent started
   Playground with `--site-url http://<LAN IP>:9400`, as the skill says. The
