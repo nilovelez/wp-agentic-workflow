@@ -16,6 +16,18 @@ A plugin that turns CampTix CSV exports into printable PDF badges.
   `100.x.y.z` address), and the same address goes in the hosts line for a
   Studio domain. The skill should detect Tailscale (a `Tailscale` network
   interface, or `tailscale ip -4` answering) and prefer that address.
+- **A test site reached by IP over HTTP is not a secure context.** The
+  plugin hashes emails for Gravatar with `crypto.subtle`, which browsers only
+  expose on HTTPS or localhost. Playground at `http://100.x.y.z:9400` has no
+  `crypto.subtle`, while real sites do, so the bug would only show on test
+  sites (or only in production, the other way round). Any browser API behind
+  a secure context (`crypto.subtle`, clipboard, service workers) needs a
+  fallback or a localhost test too.
+- **Test in a headless browser before handing over.** A throwaway
+  `puppeteer-core` script in the scratchpad, driving the installed Chrome
+  against the Playground site (log in, click, read the results table, save
+  the PDF), found two runtime errors that the build did not show, and let
+  the agent hand over measured numbers instead of guesses.
 
 ## Cute WP Badges (October 2026)
 
