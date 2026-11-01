@@ -53,6 +53,23 @@ A plugin that turns CampTix CSV exports into printable PDF badges.
   `phpcs:disable` for one sniff, a later `// phpcs:enable` with no sniff
   name turned back on rules disabled at the top of the file. Name the sniff
   in both.
+- **Data seeded during a blueprint skips the plugin's own code.** The
+  sandbox must-use plugin creates a sample design on `init`, which first
+  runs while Playground is still installing, before the plugin under test is
+  activated. The design was saved without passing through the plugin's
+  sanitizer, so it lacked a field the plugin always adds (the background
+  type), and PDF generation failed with "The source image could not be
+  decoded". Seeded data has to be complete as the plugin would store it,
+  and checked through the plugin's UI, not only through its REST output.
+- **`--mount` does not take Windows paths.** The Playground CLI splits
+  `--mount host:vfs` on the colon, so `C:\...` fails with "Invalid mount
+  format". `--mount-dir <host> <vfs>`, which takes them as two arguments,
+  works and can be repeated.
+- **Simulate the dist build locally before pushing.** `git archive HEAD`
+  (which honours `export-ignore`) plus `build/`, mounted as the plugin in a
+  second Playground on another port, tested the public demo blueprint
+  without pushing anything; only the GitHub fetches were left to check
+  after the push.
 
 - **On Tailscale, use the Tailscale IP, not the LAN IP.** The agent started
   Playground with `--site-url http://<LAN IP>:9400`, as the skill says. The
