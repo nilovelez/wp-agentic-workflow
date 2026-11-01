@@ -70,6 +70,16 @@ A plugin that turns CampTix CSV exports into printable PDF badges.
   second Playground on another port, tested the public demo blueprint
   without pushing anything; only the GitHub fetches were left to check
   after the push.
+- **A `Notice` with buttons inside needs a `spokenMessage`.** Without a
+  string `spokenMessage`, `@wordpress/components`' `Notice` runs
+  `renderToString()` on its children during render, to announce them to
+  screen readers. The hooks of every `Button` inside then count as hooks of
+  the `Notice`, so when the number of buttons changes while the notice is on
+  screen React throws ("change in the order of Hooks called by Notice") and
+  the whole editor goes blank. The headless test never saw it: there the
+  list of cut names appeared complete at once; on the developer's computer
+  it changed a moment later, probably when the web font finished loading.
+  Pasting the browser console was what found it.
 
 - **On Tailscale, use the Tailscale IP, not the LAN IP.** The agent started
   Playground with `--site-url http://<LAN IP>:9400`, as the skill says. The
