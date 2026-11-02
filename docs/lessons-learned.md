@@ -80,6 +80,25 @@ A plugin that turns CampTix CSV exports into printable PDF badges.
   list of cut names appeared complete at once; on the developer's computer
   it changed a moment later, probably when the web font finished loading.
   Pasting the browser console was what found it.
+- **Make the JavaScript translatable from the first milestone.** The editor
+  was written with plain English strings and the i18n was left in the
+  backlog; doing it later meant going through every component, turning
+  module-level constants and string concatenations into `sprintf()` calls.
+  The `@wordpress/scripts` ESLint rules help: `sprintf` must get a literal
+  format (a choice between two sentences is two `sprintf` calls, not a
+  ternary inside one), every placeholder needs a translators comment, and
+  `@wordpress/i18n` must be in `dependencies`. `wp_set_script_translations()`
+  registers the translations before the script runs, so `__()` at module
+  level works. To test without a translation file, register a fake one
+  with `wp.i18n.setLocaleData()` from `evaluateOnNewDocument()`.
+- **The agent's GitHub account may not be an admin of the repo.** Turning
+  on GitHub Pages (`POST /repos/{owner}/{repo}/pages`) needs admin rights;
+  with push rights the API answers 404, not 403. The developer has to switch
+  Pages to "GitHub Actions" in the repo settings once.
+- **A notice for small screens works best in plain CSS.** PHP prints it next
+  to the editor's container and a media query shows one or the other, so it
+  appears before the script loads and the editor keeps its state when the
+  window is resized.
 
 - **On Tailscale, use the Tailscale IP, not the LAN IP.** The agent started
   Playground with `--site-url http://<LAN IP>:9400`, as the skill says. The
