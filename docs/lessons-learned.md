@@ -91,6 +91,17 @@ A plugin that turns CampTix CSV exports into printable PDF badges.
   registers the translations before the script runs, so `__()` at module
   level works. To test without a translation file, register a fake one
   with `wp.i18n.setLocaleData()` from `evaluateOnNewDocument()`.
+- **Ask about the print format early.** Folded badges (one sheet, the face
+  twice, folded in half) were missed until the plugin was public, though it
+  is one of the two usual ways WordCamp badges are printed. With pdf-lib it
+  was cheap because the page drawing was already one function: clip in page
+  space, then a `cm` operator to turn the copy 180°, then draw. A spec
+  question list for print tools should include single or folded, one or two
+  sides, and what the print shop wants.
+- **Drafts the developer will publish go on screen, not in the repo.** The
+  agent wrote the GitHub issue draft to `docs/upstream/` (uncommitted); the
+  developer wanted it in the chat to copy. Same for PR comments and blog
+  posts.
 - **The agent's GitHub account may not be an admin of the repo.** Turning
   on GitHub Pages (`POST /repos/{owner}/{repo}/pages`) needs admin rights;
   with push rights the API answers 404, not 403. The developer has to switch
