@@ -130,6 +130,17 @@ A plugin that turns CampTix CSV exports into printable PDF badges.
   against the Playground site (log in, click, read the results table, save
   the PDF), found two runtime errors that the build did not show, and let
   the agent hand over measured numbers instead of guesses.
+- **"There is no API" was wrong: read the site's REST index first.** The
+  backlog said WordPress.org had no public way to get a profile's avatar
+  from a username. Its `/wp-json/` index lists `wporg/v1/users`, which takes
+  up to 100 usernames per request, returns their Gravatar URLs and allows
+  cross-origin requests. Before ruling out a WordPress site as a data source,
+  fetch `/wp-json/` and look at its namespaces.
+- **Check old assumptions about upstream code in the code.** The developer
+  remembered that CampTix put the buyer's WordPress.org username on every
+  ticket of an order. The current `require-login.php` gives each attendee
+  their own username after they confirm. Reading it (with `gh api`) took a
+  minute and changed the decision.
 
 ## Cute WP Badges (October 2026)
 
