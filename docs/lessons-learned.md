@@ -5,6 +5,34 @@ assumptions. They feed the skill, and an article and a talk about starting
 WordPress development with Claude. Add new ones as they happen, newest
 project first.
 
+## Moving to macOS (November 2026)
+
+The development environment moved from a Windows 11 PC to a Mac mini (M1).
+It was the first time the skill ran on macOS.
+
+- **Most of the setup is Homebrew.** Node.js, PHP, Composer and Subversion
+  came from one `brew install node php composer subversion`; only Studio
+  needs its installer and the developer at the computer. Git came with the
+  Xcode Command Line Tools.
+- **The environment scripts work unchanged on macOS.** `check-env.mjs`,
+  `check-php.php` and `site-address.mjs` gave the right results the first
+  time, including the Tailscale IP from Homebrew's `tailscale` CLI.
+- **Homebrew's PHP comes with `memory_limit = 128M`.** `check-php.php`
+  flagged it and printed the `php.ini` line to change (512M).
+- **Studio CLI 2.1.1 is installed in `~/.local/bin`.** The skill's Studio
+  notes were written against CLI 1.24; 2.x keeps the options the skill uses
+  (`create --blueprint`, `--path`, `--start`, `--skip-browser`) but is not
+  tested with it yet.
+- **Studio's default sites folder can be changed in the app, but
+  `studio-site.mjs` doesn't read it.** It creates sites in `~/Studio/<slug>`
+  unless given `--sites-dir`. The developer set the app back to the default
+  to stay consistent.
+- **Moving computers is a checklist.** The repo is on GitHub, but Claude's
+  project memory (`~/.claude/projects/<path-based name>/memory/`) and the
+  user-level `~/.claude/CLAUDE.md` are not: copy them by hand, and fix
+  anything platform-specific (Windows shell notes, `D:\` paths). Skills are
+  reinstalled with `npx skills add`.
+
 ## Camptix Badge Generator, now CampTix Badge Designer (October 2026)
 
 A plugin that turns CampTix CSV exports into printable PDF badges.
