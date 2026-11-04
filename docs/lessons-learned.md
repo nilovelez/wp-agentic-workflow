@@ -213,19 +213,21 @@ and that started as a static HTML page before becoming a plugin.
 - **Prefer the Tailscale IP for test sites.** Before starting a site, check
   this machine's IPs; if it has a Tailscale one, use it in `--site-url`.
 
-## Shell on Windows (October 2026)
+## The Bash tool and shell quirks (October 2026)
 
-Found while working on a plain PHP project, but it applies to any project on
-Windows where the agent runs commands through Claude Code.
+Found while working on a plain PHP project, but it applies to any project
+where the agent runs commands through Claude Code. The first two points
+happen on Windows and on macOS; the last two are Windows only.
 
-- **The Bash tool halves backslashes.** On Windows, Claude Code's Bash tool
-  (Git Bash) loses half the backslashes before bash sees the command:
-  `echo 'a\\b'` prints `a\b`, even in single quotes, and a quoted heredoc
-  (`<<'EOF'`) does the same. It looked like a Git Bash problem and wasn't:
-  bash 5.3 has no rc files, no `BASH_ENV`, and `posix` and `xpg_echo` are
-  off, the same text run from a `.sh` file keeps its backslashes, and
-  reinstalling Git (2.55 to 2.56) changed nothing. The loss happens in how
-  the tool hands the command to bash. Reported to Anthropic.
+- **The Bash tool halves backslashes.** Claude Code's Bash tool loses half
+  the backslashes before the shell sees the command: `echo 'a\\b'` prints
+  `a\b`, even in single quotes, and a quoted heredoc (`<<'EOF'`) does the
+  same. It was found on Windows, in Git Bash, and it looked like a Git Bash
+  problem. It wasn't: bash 5.3 has no rc files, no `BASH_ENV`, and `posix`
+  and `xpg_echo` are off, the same text run from a `.sh` file keeps its
+  backslashes, and reinstalling Git (2.55 to 2.56) changed nothing. Moving
+  to a Mac gave the same result, so the loss happens in how the tool hands
+  the command to the shell, not in any one shell. Reported to Anthropic.
 - **What to do instead.** Create files with the Write and Edit tools, never
   with `echo` or heredocs. For a helper script, write it to a file and run it
   with its path. The PowerShell tool passes the same text intact. A tell-tale
