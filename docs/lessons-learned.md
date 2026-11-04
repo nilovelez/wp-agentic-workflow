@@ -27,6 +27,19 @@ It was the first time the skill ran on macOS.
   `studio-site.mjs` doesn't read it.** It creates sites in `~/Studio/<slug>`
   unless given `--sites-dir`. The developer set the app back to the default
   to stay consistent.
+- **`studio-site.mjs` works on macOS with Studio CLI 2.1.1.** Recreating
+  Quevedo's site with `--sites-dir` applied the blueprint, made the symbolic
+  link to the repo and activated the plugin in one run; `studio wp` then
+  installed the Spanish locale and Plugin Check with the site stopped.
+- **Plugin Check on the linked repo reports the development files.** Run
+  against the repo folder, it flags `vendor/`, hidden files, `.github` and
+  extra Markdown files as errors and warnings. Useful as a smoke test of the
+  site, but the result that counts is Plugin Check on the extracted release
+  zip.
+- **A sparse SVN checkout is enough to compare with the release.** After the
+  move, `diff -rq --exclude=.svn` between `trunk/` and `git archive v<version>`
+  confirmed the working copy before any commit. The cached WordPress.org
+  credentials stay on the old computer.
 - **Moving computers is a checklist.** The repo is on GitHub, but Claude's
   project memory (`~/.claude/projects/<path-based name>/memory/`) and the
   user-level `~/.claude/CLAUDE.md` are not: copy them by hand, and fix
