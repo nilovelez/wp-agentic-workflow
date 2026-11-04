@@ -31,13 +31,17 @@ This project publishes its status to Guppy, Nilo's project manager (https://gith
 - `guppy/STATUS.md`: extended status and work log, for agents working on this project. It is never synced anywhere.
 - `guppy/STATUS.json`: public summary, following the status contract (https://github.com/manuelstone/guppy/blob/main/docs/status-contract.md). `.github/workflows/guppy-sync.yml` copies it to Guppy every time it changes on the default branch, and from there it goes to a public website. Never put private information, credentials or secrets in it.
 
-At the end of any session that changes the project status:
+At the end of every work session on the project, even when the status stays the same:
 
 1. Update the Status section of `guppy/STATUS.md` and add a brief entry at the top of its Log.
-2. Update `guppy/STATUS.json`: `status`, `status_text`, and `last_update` with `last_update_unix`. Take both dates from a single timestamp: `ts=$(date +%s); date -d "@$ts" '+%Y-%m-%d %H:%M:%S %z'; echo "$ts"` (GNU date; the contract has the macOS and PowerShell versions). If the status did not change, do not touch the dates.
+2. Update `guppy/STATUS.json`: `status`, `status_text`, and `last_update` with `last_update_unix`. Update the dates after every work session, even when `status` does not change: a stale date means nobody has worked on the project since. Take both from a single timestamp:
+   - macOS (BSD date): `ts=$(date +%s); date -r "$ts" '+%Y-%m-%d %H:%M:%S %z'; echo "$ts"`
+   - Linux or Git Bash (GNU date): `ts=$(date +%s); date -d "@$ts" '+%Y-%m-%d %H:%M:%S %z'; echo "$ts"`
+
+   The contract has the PowerShell version. Changing only `title`, `description` or `icon` does not touch the dates.
 3. Commit both files with the rest of the session's changes and push to the default branch.
 
-Statuses: `active` (being worked on), `blocked` (waiting for something outside the project), `inactive` (stopped by choice), `planned` (decided, not started), `archived` (closed).
+Statuses: `active` (being worked on), `blocked` (waiting for something outside the project), `inactive` (not being worked on and nothing to keep an eye on: paused, or finished and working; the normal status of a finished project), `planned` (decided, not started), `archived` (put away by Nilo). Only Nilo archives a project: never set or suggest `archived`; a finished, released or paused project is `inactive`.
 
 `status_text`: one or two sentences, under 200 characters, plain text. Say where the project stands and what comes next; if blocked, start with what it is waiting for and from whom. Self-contained: no relative dates, name versions and third parties. Rewrite it in full each time; the history goes in the Log.
 
