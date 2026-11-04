@@ -32,6 +32,11 @@ It was the first time the skill ran on macOS.
   user-level `~/.claude/CLAUDE.md` are not: copy them by hand, and fix
   anything platform-specific (Windows shell notes, `D:\` paths). Skills are
   reinstalled with `npx skills add`.
+- **Git over HTTPS couldn't reach the macOS keychain from Claude Code.** The push
+  failed with `failed to get: -25308` (the keychain refuses access without
+  user interaction), and `gh` reported its token as invalid for the same
+  reason. `gh auth login --insecure-storage` keeps the token in
+  `~/.config/gh/hosts.yml` instead, and `gh auth setup-git` makes Git use it.
 
 ## Camptix Badge Generator, now CampTix Badge Designer (October 2026)
 
