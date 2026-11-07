@@ -5,6 +5,33 @@ assumptions. They feed the skill, and an article and a talk about starting
 WordPress development with Claude. Add new ones as they happen, newest
 project first.
 
+## WordPress.tv: the Meta repository's environment (November 2026)
+
+The WordPress.org Meta repository runs each site's local environment and
+PHPUnit suite with wp-env. Running the WordPress.tv one on the Mac took more
+than `npm run wptv:env start`.
+
+- **wp-env's Playground runtime can't replace Docker.** wp-env 11 has an
+  experimental `--runtime=playground` that starts WordPress without Docker,
+  but it doesn't support `wp-env run`. The environment's setup script and its
+  PHPUnit command both use `run`, so they fail.
+- **Colima is enough for Docker on a Mac.** `brew install colima docker`, then
+  `colima start`: free, command line only, no Docker Desktop.
+- **Homebrew's Docker CLI comes without Compose.** wp-env needs
+  `docker compose`: install `docker-compose` and add
+  `"cliPluginsExtraDirs": ["/opt/homebrew/lib/docker/cli-plugins"]` to
+  `~/.docker/config.json`.
+- **Colima only shares the home folder with its VM.** With the repositories on
+  another disk (`/Volumes/Datos`), the containers saw their bind mounts empty:
+  the mu-plugins failed to load and Jetpack was "not found", with no word
+  about mounts. Start it with `--mount "$HOME:w" --mount /Volumes/Datos:w`.
+  Passing any `--mount` replaces the default, so `$HOME` has to be listed too.
+- **wp-env's test environment collides with the development one.** Both use
+  port 8888. Run the tests with `WP_ENV_PORT` and `WP_ENV_MYSQL_PORT` set to
+  other ports and their own `WP_ENV_HOME`.
+- **`WP_ENV_HOME` keeps wp-env's data out of the home folder.** Point it at
+  scratch; it must also be under a folder Colima shares.
+
 ## Moving to macOS (November 2026)
 
 The development environment moved from a Windows 11 PC to a Mac mini (M1).
