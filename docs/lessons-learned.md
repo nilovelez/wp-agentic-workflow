@@ -5,6 +5,36 @@ assumptions. They feed the skill, and an article and a talk about starting
 WordPress development with Claude. Add new ones as they happen, newest
 project first.
 
+## WordPress.tv: a theme in another repository, linked into Studio (November 2026)
+
+The theme moved into a fork of the WordPress.org Meta repository, outside the
+Studio site, and the site's `wp-content/themes/wptv-27` became a symlink to it.
+
+- **Studio limits PHP to the site folder by default.** Sites run with
+  `file-access: site-directory`: `open_basedir` covers only the site folder
+  (plus Studio's own paths), and some risky functions are disabled.
+  `studio config set --file-access all-files` lifts it. WP-CLI through
+  `studio wp` isn't restricted, so it can see a theme the web server can't.
+- **Symlinks out of the site folder work, if the site starts with them.** On
+  start, Studio scans the site root and `wp-content` for symlinks and adds
+  their targets to `open_basedir`. While running, it watches `wp-content` two
+  levels deep and restarts PHP about 750 ms after a new symlink appears. Read
+  in the Studio CLI source (`php-server-child.mjs`), not documented.
+- **Swap a theme symlink only with the site stopped.** Replacing the folder
+  with a symlink on a running site, then loading pages straight away, hit the
+  window before the restart: WordPress couldn't read the theme and switched
+  the site to the default theme (`stylesheet` became `twentytwentyfive`). The
+  front end showed the default theme while `wp theme list` had shown the right
+  one moments before. Stop, swap, start, then check `wp option get stylesheet`
+  before loading pages.
+- **Diagnose from the web server, not WP-CLI.** A throwaway PHP file in the
+  site root, printing `get_option( 'stylesheet' )`, the theme's `realpath()`
+  and `ini_get( 'open_basedir' )`, showed the real state in one request.
+- **Don't reorganize folders to work around a failure.** Moving the repository
+  into the site folder "fixed" it, but it wasn't the owner's layout and the
+  cause was the timing above. Stop at the first unexpected result, find the
+  cause, and let the owner decide.
+
 ## WordPress.tv: the Meta repository's environment (November 2026)
 
 The WordPress.org Meta repository runs each site's local environment and
