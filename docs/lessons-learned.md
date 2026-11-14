@@ -102,49 +102,69 @@ small changes.
   (blocked by the permission system, by design) and then wrote its own
   string-comparison script. The developer wants the environment fixed the
   intended way (here, the Studio site), not improvised around.
-- **`defineWpConfigConsts` corrupts the SQLite database with several
-  Playground workers (CLI 3.1.64, the latest at the time, macOS).** Two
-  Playground sites ended up with `database disk image is malformed` errors
-  from the second they booted, and one lost its database entirely. Cause,
-  traced in Playground's code and confirmed with tests:
-  1. Playground passes its constants to WordPress through a shared file,
-     `/internal/shared/consts.json` (`defineConstant()` reads it, adds the
-     key and writes it back, with no lock). One of them is
+- **Blueprints that define constants corrupt the SQLite database with
+  several Playground workers (CLI 3.1.64, the latest at the time, macOS).**
+  Two Playground sites ended up with `database disk image is malformed`
+  errors from the second they booted, and one lost its database entirely.
+  How it happens:
+  1. Playground passes constants to WordPress through a shared file,
+     `/internal/shared/consts.json`: `defineConstant()` reads it, adds the
+     key and writes it back, with no lock, and PHP reads it with
+     `json_decode()` on every request. One of the constants is
      `SQLITE_JOURNAL_MODE: DELETE`, Playground's fix for
      [#3883](https://github.com/WordPress/wordpress-playground/issues/3883)
      (PR #3909, CLI 3.1.44), because SQLite's WAL mode doesn't work across
      Playground workers.
-  2. With several workers (the default is min(6, CPUs − 1)), the blueprint's
-     `defineWpConfigConsts` step, with its default method, rewrites
-     `consts.json` with only its own constants. Playground's are gone:
-     `SQLITE_JOURNAL_MODE`, `WP_HOME`, `WP_SITEURL`,
-     `PLAYGROUND_AUTO_LOGIN_AS_USER`...
-  3. Without `SQLITE_JOURNAL_MODE`, the SQLite integration plugin (3.1.3)
-     defaults to WAL, and the #3883 corruption is back. The lost
-     `PLAYGROUND_AUTO_LOGIN_AS_USER` also explains Playground's auto-login
-     failing on some sites.
+  2. With several workers (the default is min(6, CPUs − 1)) and two blueprint
+     steps that each define a constant, such as `login` (it defines
+     `PLAYGROUND_AUTO_LOGIN_AS_USER`) followed by `defineWpConfigConsts` with
+     its default method, `consts.json` ends up as invalid JSON: the second
+     write misses the first step's constant and is shorter, but the file
+     keeps its old length, so the end of the previous content stays after
+     the closing brace (`…}S_USER":"admin"}`). With one worker the file is
+     fine.
+  3. PHP can't decode the broken file and defines none of the constants.
+     Without `SQLITE_JOURNAL_MODE`, the SQLite integration plugin (3.1.3)
+     defaults to WAL, and the #3883 corruption is back. A later
+     `defineConstant()` also fails to parse the file, starts from an empty
+     object and drops every constant but its own, which is what one broken
+     site showed: only the blueprint's constants were left. The lost
+     `PLAYGROUND_AUTO_LOGIN_AS_USER` explains Playground's auto-login failing
+     on some sites.
 
-  Tests, 6 workers unless stated, checking `consts.json`, the database's
-  `journal_mode` (on a copy) and the debug log after boot and after 8
-  parallel logged-in sessions:
+  A blueprint with only `defineWpConfigConsts` did not reproduce it; `login`
+  plus `defineWpConfigConsts` did, twice out of two. Minimal reproduction:
 
-  | Blueprint | `SQLITE_JOURNAL_MODE` | Journal mode | "malformed" errors |
+  ```json
+  { "steps": [ { "step": "login" }, { "step": "defineWpConfigConsts", "consts": { "MY_TEST_CONSTANT": true } } ] }
+  ```
+
+  Tests, checking `consts.json` and the database's `journal_mode` (on a
+  copy) after boot and after 8 parallel logged-in sessions:
+
+  | Blueprint | Workers | `consts.json` | Journal mode |
   |---|---|---|---|
-  | With `defineWpConfigConsts` | lost | `wal` | yes, at boot |
-  | With `defineWpConfigConsts`, `--workers=1` | `DELETE` | `delete` | none |
-  | Without `defineWpConfigConsts` | `DELETE` | `delete` | none |
-  | With `defineWpConfigConsts` and `"method": "rewrite-wp-config"` | `DELETE` | `delete` | none |
+  | `defineWpConfigConsts` only | 6 | valid | `delete` |
+  | `login` + `defineWpConfigConsts` | 1 | valid | `delete` |
+  | `login` + `defineWpConfigConsts` | 6 | invalid JSON | `delete` at boot, `wal` after the requests |
+  | The theme's full blueprint (`login`, `defineWpConfigConsts`, `activateTheme`) | 6 | only the blueprint's constants | `wal`, "malformed" errors at boot |
+  | The same with `"method": "rewrite-wp-config"` | 6 | valid | `delete`, no errors |
 
-  `--workers=1` avoids it but serves one request at a time. The fix is
-  `"method": "rewrite-wp-config"`: the constants go to `wp-config.php` as
-  plain `define()` calls and `consts.json` is left alone (no "already
-  defined" notices). Proposed for the skill: add that method to
-  `templates/blueprint.json`, and explain why in `references/playground.md`,
-  next to the blueprint rules. Not reported upstream yet.
+  `--workers=1` avoids it but serves one request at a time. What works is
+  `"method": "rewrite-wp-config"` on every `defineWpConfigConsts` step: the
+  constants go to `wp-config.php` as plain `define()` calls, the step doesn't
+  touch `consts.json`, and there are no "already defined" notices. The
+  `login` step still writes to `consts.json`, but alone it is a single
+  write. Proposed for the skill: add that method to
+  `templates/blueprint.json` and explain why in `references/playground.md`,
+  next to the blueprint rules; any other step that calls `defineConstant()`
+  is a risk too. To be reported upstream.
 
-  Dead end on the way: absent `-wal`/`-shm` files next to the database were
+  Dead ends on the way: absent `-wal`/`-shm` files next to the database were
   first taken as the cause. They prove nothing: with exclusive locking SQLite
   uses no `-shm`, and the `-wal` is deleted when the last connection closes.
+  Then `defineWpConfigConsts` alone was blamed, until the minimal
+  reproduction without `login` came out clean.
 
 ## WordPress.tv: a theme in another repository, linked into Studio (November 2026)
 
