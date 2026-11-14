@@ -5,6 +5,147 @@ assumptions. They feed the skill, and an article and a talk about starting
 WordPress development with Claude. Add new ones as they happen, newest
 project first.
 
+## Intentionally Blank: the plugin workflow on a classic theme (November 2026)
+
+First run of the skill on a theme repo, on macOS. The skill's tooling and
+templates assume a plugin; everything except Plugin Check carried over with
+small changes.
+
+- **`check-env.mjs` fails on a theme.** It looks for a PHP file with a
+  `Plugin Name:` header and reports NOT READY. Every tool was fine; the only
+  failure was the missing plugin header. A theme check would look for
+  `style.css` with a `Theme Name:` header (and folder = Text Domain).
+- **Blueprint for a theme:** mount the repo at
+  `/wordpress/wp-content/themes/<slug>` and use `activateTheme` with
+  `themeFolderName` instead of `activatePlugin`. The landing page makes more
+  sense as `/` than `/wp-admin/plugins.php`. Worked first time on macOS.
+- **`.gitattributes` for a theme:** don't export-ignore `screenshot.png`
+  (the theme needs it); `/.github` and `/guppy` go out of the zip too.
+- **An old `phpcs.xml` was the WPCS sample ruleset.** It used
+  `minimum_supported_wp_version`, which WPCS 3 renamed to
+  `minimum_wp_version`, and no `composer.json` installed WPCS at all. Moved
+  it to `phpcs.xml.dist` (as the template expects), kept its text domain,
+  prefix, minimum WordPress (4.6) and PHP (7.4) values.
+- **Plugin Check doesn't apply.** The theme equivalent is the Theme Check
+  plugin (`theme-check`); the skill doesn't cover it yet. (This particular
+  theme is flagged as a special case in the WordPress.org theme directory and
+  skips Theme Check, but any other theme would need it.)
+- **The blueprint's `preferredVersions` beats `--php` and `--wp`.** Starting
+  the Playground CLI with `--php 8.2 --wp 6.1` and the repo blueprint (PHP
+  8.3, WordPress latest) ran PHP 8.3, silently. Checked with the
+  `X-Powered-By` header. To test the minimum and latest versions, write
+  throwaway copies of the blueprint with other `preferredVersions` in scratch.
+- **WordPress 6.1 on PHP 8.2 fills the debug log with core deprecations**
+  (`Requests`, `formatting.php`, `pluggable.php`). Filter the log by the
+  theme or plugin path before judging it.
+- **Testing the release zip, not the repo:** extract the `git archive` zip
+  and mount the extracted folder in Playground. The site then runs exactly
+  what WordPress.org will get.
+- **Studio site for a theme: the same steps as `studio-site.mjs`, with
+  `themes/` instead of `plugins/`.** The script stops on a theme (it needs a
+  `Plugin Name:` header), so the steps were run by hand on macOS with Studio
+  CLI 2.2.0, and they worked:
+  1. `studio create --path ~/Studio/<slug> --name "<Theme Name>" --php 8.3
+     --file-access all-files --domain <slug>.local --admin-password password
+     --no-start --skip-browser --skip-log-details --blueprint ./blueprint.json`
+     from the repo root. The blueprint's `activateTheme` step does nothing
+     during creation (the theme isn't linked yet) and Studio skips it without
+     an error: the site ends up on the default theme (`twentytwentyfive`),
+     just as `activatePlugin` is skipped for a plugin.
+  2. `ln -s <repo path> ~/Studio/<slug>/wp-content/themes/<slug>`.
+  3. `studio wp --path ~/Studio/<slug> theme activate <slug>`, then check with
+     `studio wp --path ~/Studio/<slug> option get stylesheet`.
+  For the script: detect a theme by `style.css` with a `Theme Name:` header
+  at the repo root, take the name from it, link into `wp-content/themes/` and
+  run `theme activate` instead of `plugin activate`. Deleting the site needs
+  the same care as for a plugin: remove the link under `themes/` first.
+  `theme list` shows "version higher than expected" while the repo's version
+  isn't deployed on WordPress.org yet; that is expected.
+- **`studio wp --studio-no-path` doesn't work (Studio CLI 2.1.1 and 2.2.0,
+  macOS).** From the repo root, `studio wp --studio-no-path i18n make-pot
+  ...` and even `studio wp --studio-no-path --version` answer "The specified
+  directory is not added to Studio". With the Studio site created, `studio wp
+  --path <site> i18n make-pot <repo> <out.pot> --exclude=vendor` works, so
+  repo-only WP-CLI tasks need the Studio site too.
+- **The first `studio start` on macOS, launched by the agent, failed at the
+  hosts file.** The administrator prompt appeared on screen, but it rejected
+  the developer's credentials ("user or password incorrect") and Studio
+  reported "User did not grant permission". The developer then ran `studio
+  start` by hand in their own terminal, entered the administrator account and
+  it worked. On macOS, ask the developer to run the first start themselves.
+- **Updating Studio from its app doesn't update the Studio CLI.** The app
+  showed 2.2.0 while `studio --version` still said 2.1.1; the CLI had to be
+  updated separately (`curl -fsSL https://wordpress.studio/install.sh |
+  bash`, as the CLI's own update notice says). Check `studio --version` after
+  updating the app.
+- **Guard the translated strings with WP-CLI.** For a theme or plugin
+  already translated on translate.wordpress.org, generate a POT of the last
+  release (`git archive <tag>` into scratch, then `i18n make-pot`) and of the
+  working tree, and diff their sorted `msgid` lines before each commit. Any
+  changed string drops its translations in every language. In this theme the
+  `style.css` headers (Theme Name, Description, Author, URIs) are translated
+  strings too.
+- **Playwright: install `playwright-core` globally and link it.** The
+  developer wants it global (`npm install -g playwright-core`), shared by
+  every session, not installed per scratch folder. A global package can't be
+  imported from an ES module script (`ERR_MODULE_NOT_FOUND`: Node doesn't
+  search the global folder for `import`), so run `npm link playwright-core`
+  in the scratch folder of the scripts: it creates a link, no new download.
+- **Log in through the site's own URL.** A Playground started with
+  `--site-url http://<address>:<port>` sets its cookies for that host. Going
+  to `http://127.0.0.1:<port>/wp-login.php` posts the form, but the session
+  doesn't stick and every admin page goes back to the login (Playground's
+  auto-login fails the same way in headless Chrome). Use the same URL that
+  was passed to `--site-url`.
+- **When a tool is missing or fails, stop and ask.** Here `--studio-no-path`
+  failed and, instead of asking, the agent tried to download `wp-cli.phar`
+  (blocked by the permission system, by design) and then wrote its own
+  string-comparison script. The developer wants the environment fixed the
+  intended way (here, the Studio site), not improvised around.
+- **`defineWpConfigConsts` corrupts the SQLite database with several
+  Playground workers (CLI 3.1.64, the latest at the time, macOS).** Two
+  Playground sites ended up with `database disk image is malformed` errors
+  from the second they booted, and one lost its database entirely. Cause,
+  traced in Playground's code and confirmed with tests:
+  1. Playground passes its constants to WordPress through a shared file,
+     `/internal/shared/consts.json` (`defineConstant()` reads it, adds the
+     key and writes it back, with no lock). One of them is
+     `SQLITE_JOURNAL_MODE: DELETE`, Playground's fix for
+     [#3883](https://github.com/WordPress/wordpress-playground/issues/3883)
+     (PR #3909, CLI 3.1.44), because SQLite's WAL mode doesn't work across
+     Playground workers.
+  2. With several workers (the default is min(6, CPUs − 1)), the blueprint's
+     `defineWpConfigConsts` step, with its default method, rewrites
+     `consts.json` with only its own constants. Playground's are gone:
+     `SQLITE_JOURNAL_MODE`, `WP_HOME`, `WP_SITEURL`,
+     `PLAYGROUND_AUTO_LOGIN_AS_USER`...
+  3. Without `SQLITE_JOURNAL_MODE`, the SQLite integration plugin (3.1.3)
+     defaults to WAL, and the #3883 corruption is back. The lost
+     `PLAYGROUND_AUTO_LOGIN_AS_USER` also explains Playground's auto-login
+     failing on some sites.
+
+  Tests, 6 workers unless stated, checking `consts.json`, the database's
+  `journal_mode` (on a copy) and the debug log after boot and after 8
+  parallel logged-in sessions:
+
+  | Blueprint | `SQLITE_JOURNAL_MODE` | Journal mode | "malformed" errors |
+  |---|---|---|---|
+  | With `defineWpConfigConsts` | lost | `wal` | yes, at boot |
+  | With `defineWpConfigConsts`, `--workers=1` | `DELETE` | `delete` | none |
+  | Without `defineWpConfigConsts` | `DELETE` | `delete` | none |
+  | With `defineWpConfigConsts` and `"method": "rewrite-wp-config"` | `DELETE` | `delete` | none |
+
+  `--workers=1` avoids it but serves one request at a time. The fix is
+  `"method": "rewrite-wp-config"`: the constants go to `wp-config.php` as
+  plain `define()` calls and `consts.json` is left alone (no "already
+  defined" notices). Proposed for the skill: add that method to
+  `templates/blueprint.json`, and explain why in `references/playground.md`,
+  next to the blueprint rules. Not reported upstream yet.
+
+  Dead end on the way: absent `-wal`/`-shm` files next to the database were
+  first taken as the cause. They prove nothing: with exclusive locking SQLite
+  uses no `-shm`, and the `-wal` is deleted when the last connection closes.
+
 ## WordPress.tv: a theme in another repository, linked into Studio (November 2026)
 
 The theme moved into a fork of the WordPress.org Meta repository, outside the
