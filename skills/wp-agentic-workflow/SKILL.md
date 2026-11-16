@@ -6,7 +6,7 @@ compatibility: "WordPress plugins (themes not covered yet). Node.js 20.18+, PHP 
 
 # WordPress plugin workflow
 
-One way of developing a WordPress plugin, the same on every project, from the first line of code to WordPress.org. It follows what WordPress officially recommends at the moment (Playground, Blueprints, Studio, WP-CLI, the WordPress Coding Standards, Plugin Check) and builds on the official skills from [WordPress/agent-skills](https://github.com/WordPress/agent-skills); this skill only adds the glue between them and a few opinions. Don't use or suggest wp-env.
+One way of developing a WordPress plugin, the same on every project, from the first line of code to WordPress.org. It follows what WordPress officially recommends at the moment (Playground, Blueprints, Studio, WP-CLI, the WordPress Coding Standards, Plugin Check) and builds on the official skills from [WordPress/agent-skills](https://github.com/WordPress/agent-skills); this skill only adds the glue between them and a few opinions. Don't set up or suggest wp-env: it needs Docker, and Playground and Studio cover the same without it. If a project already uses wp-env (its own scripts, its test suite), that is the project's choice: use it as it is.
 
 `<skill>` below is the folder of this skill.
 
@@ -56,7 +56,7 @@ If they don't exist yet, add from `templates/`:
 - `composer.json` and `phpcs.xml.dist`: WPCS (`references/quality.md`).
 - `.gitattributes` and `.gitignore`: development files out of the zip (`references/release.md`).
 
-Adapt them to the plugin (slug, text domain, prefix, dependencies). Don't overwrite existing files: merge.
+Adapt them to the plugin (slug, text domain, prefix, dependencies). Don't overwrite existing files: merge. They may carry the project's own settings (exclusions, rules, dependencies) that the template doesn't know about, and overwriting would drop them silently.
 
 ### 3. Test sites
 

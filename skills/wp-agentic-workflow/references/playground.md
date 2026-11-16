@@ -21,7 +21,6 @@ A real example: the [blueprint of Classic Honeypot for CF7](https://github.com/n
 
 Rules:
 
-- Make `runPHP` steps idempotent (check before creating), so the same blueprint can run on a site that already has the content.
 - Steps that create test content must not depend on the plugin being active: on Studio the plugin is activated after the blueprint runs (see `studio.md`).
 - The blueprint is applied when a site is created, not on every run of a persistent site: changes to it need a new site.
 - Playground can't send email. If the plugin sends mail (or depends on one that does, like Contact Form 7), configure the test content so it doesn't need to (in Contact Form 7: `skip_mail: on` in the form's additional settings).

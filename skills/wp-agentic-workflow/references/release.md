@@ -79,7 +79,7 @@ Check its contents (`unzip -l` or open it) before submitting: no development fil
 
 ## After submitting
 
-The automated scan runs first; then the plugin waits in the manual review queue (it can take weeks). If the reviewers ask for changes, **reply to their email**; never submit the plugin again.
+The automated scan runs first; then the plugin waits in the manual review queue (it can take weeks).
 
 Several emails can arrive close together: an AI-assisted pre-review ("Let's improve your plugin") and the approval ("Your review has been successfully completed"). Read them all, in order, before acting. Once approved, the slug is final and no reply is needed. From then on the plugin is published: change its text in the project's `CLAUDE.md` and add the sentence to the README (see "Published or not"). Still go through each pre-review finding: fix the real ones in the next version (they will come up again in later reviews) and leave the rest.
 
@@ -107,7 +107,7 @@ For each version, after WPCS and Plugin Check are clean and the release is commi
 6. Check `svn status`, and compare `trunk/` and `tags/<version>/` with the zip.
 7. Commit: `svn commit -m "Release <version>"`. It publishes the plugin, so it is the developer's call: prepare everything, show what will be committed, and commit only when they say so, or give them the command.
 
-The commit needs the developer's SVN password. It may be cached (the `svn` from TortoiseSVN shares its credential store): check with `svn auth plugins.svn.wordpress.org` before committing. If nothing is cached, the developer enters it in a terminal or makes the commit. Never ask for the password in the chat.
+The commit needs the developer's SVN password. It may be cached (the `svn` from TortoiseSVN shares its credential store): check with `svn auth plugins.svn.wordpress.org` before committing. If nothing is cached, the developer enters it in a terminal or makes the commit. Never ask for the password in the chat: the conversation is stored, and that password lets anyone publish a version of the plugin to every site that uses it.
 
 Afterwards, check the published plugin, not just the commit:
 
