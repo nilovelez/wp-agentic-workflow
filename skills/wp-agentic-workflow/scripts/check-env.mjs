@@ -28,10 +28,20 @@ const installHints = {
 		darwin: 'brew install node (or the LTS installer from https://nodejs.org/)',
 		linux: 'Node.js LTS from https://nodejs.org/ (distribution packages are often too old)',
 	},
+	wpcli: {
+		win32: 'Download https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar to a folder in the PATH and add a wp.bat next to it containing: @php "%~dp0wp-cli.phar" %*',
+		darwin: 'brew install wp-cli',
+		linux: 'curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar && chmod +x wp-cli.phar && sudo mv wp-cli.phar /usr/local/bin/wp',
+	},
+	studioApp: {
+		win32: 'Install WordPress Studio from https://developer.wordpress.com/studio/',
+		darwin: 'Install WordPress Studio from https://developer.wordpress.com/studio/ and open it once',
+		linux: 'WordPress Studio is not available for Linux: Playground covers every test site',
+	},
 	studio: {
-		win32: 'Install WordPress Studio from https://developer.wordpress.com/studio/ (the `studio` command comes with it)',
-		darwin: 'Install WordPress Studio from https://developer.wordpress.com/studio/ (the `studio` command comes with it)',
-		linux: 'WordPress Studio is not available for Linux: use Playground for test sites and install WP-CLI from https://wp-cli.org/',
+		win32: 'Turn on the Studio CLI in the Studio app settings, then open a new terminal',
+		darwin: 'Turn on the Studio CLI in the Studio app settings (or: curl -fsSL https://wordpress.studio/install.sh | bash), then open a new terminal',
+		linux: 'WordPress Studio is not available for Linux: Playground covers every test site',
 	},
 	php: {
 		win32: 'winget install --id PHP.PHP.NTS.8.4 -e, then run scripts/check-php.php to fix php.ini',
@@ -119,6 +129,53 @@ function findChrome() {
 }
 
 /**
+ * Finds the WordPress Studio app in its usual install location, or returns
+ * null. The Windows locations are not tested yet.
+ */
+function findStudioApp() {
+	const candidates = {
+		win32: [
+			path.join( process.env.LOCALAPPDATA || '', 'studio', 'Studio.exe' ),
+			path.join( process.env.LOCALAPPDATA || '', 'Programs', 'Studio', 'Studio.exe' ),
+		],
+		darwin: [ '/Applications/Studio.app', path.join( process.env.HOME || '', 'Applications', 'Studio.app' ) ],
+		linux: [],
+	};
+	for ( const candidate of candidates[ platform ] || [] ) {
+		if ( existsSync( candidate ) ) {
+			return candidate;
+		}
+	}
+	return null;
+}
+
+/**
+ * Asks WP-CLI for its version and the path of its .phar file, which
+ * Playground mounts to run WP-CLI inside a site. Returns null if `wp` is
+ * missing. WP-CLI may print PHP deprecation notices before the JSON, so only
+ * the line that starts with "{" is read.
+ */
+function findWpCli() {
+	const output = run( 'wp --info --format=json' );
+	if ( ! output ) {
+		return null;
+	}
+	const jsonLine = output.split( /\r?\n/ ).find( ( line ) => line.startsWith( '{' ) );
+	if ( ! jsonLine ) {
+		return null;
+	}
+	try {
+		const info = JSON.parse( jsonLine );
+		return {
+			version: info.wp_cli_version,
+			phar: info.wp_cli_phar_path ? info.wp_cli_phar_path.replace( /^phar:\/\//, '' ) : null,
+		};
+	} catch ( error ) {
+		return null;
+	}
+}
+
+/**
  * Looks for the main plugin file (a PHP file in the root with a
  * "Plugin Name:" header) and reads its Text Domain.
  */
@@ -162,14 +219,27 @@ addCheck( 'node', 'Node.js', true, nodeOk, nodeVersion + ( nodeOk ? '' : ' (need
 const npmVersion = findVersion( run( 'npm --version' ) );
 addCheck( 'npm', 'npm / npx', true, null !== npmVersion, npmVersion || 'not found (it comes with Node.js)' );
 
-// WordPress Studio CLI: persistent test site and WP-CLI (`studio wp`).
-const studioVersion = findVersion( run( 'studio --version' ) );
-addCheck( 'studio', 'Studio CLI', true, null !== studioVersion, studioVersion || 'not found' );
-
-// PHP and Composer: only for PHPCS with the WordPress Coding Standards.
+// PHP and Composer: PHPCS with the WordPress Coding Standards, and WP-CLI.
 const phpVersion = run( 'php -r "echo PHP_VERSION;"' );
 const phpOk = null !== phpVersion && isAtLeast( phpVersion, '7.4.0' );
 addCheck( 'php', 'PHP CLI', true, phpOk, phpVersion ? phpVersion + ( phpOk ? '' : ' (needs 7.4 or later)' ) : 'not found' );
+
+// WP-CLI: tasks on the repo alone (i18n), and, mounted into Playground, any
+// command on a test site. The .phar path is what scripts/playground-wp.mjs mounts.
+const wpCli = findWpCli();
+const wpCliOk = null !== wpCli && null !== wpCli.phar;
+let wpCliDetail = 'not found';
+if ( wpCli ) {
+	wpCliDetail = wpCli.version + ( wpCli.phar ? ', ' + wpCli.phar : ' (not a .phar install: Playground can\'t mount it)' );
+}
+addCheck( 'wpcli', 'WP-CLI', true, wpCliOk, wpCliDetail );
+
+// WordPress Studio: recommended, not required. Only for a persistent site
+// that stays running with a fixed domain; Playground covers everything else.
+const studioApp = findStudioApp();
+addCheck( 'studioApp', 'Studio app', false, null !== studioApp, studioApp || 'not found (recommended, for a persistent test site)' );
+const studioVersion = findVersion( run( 'studio --version' ) );
+addCheck( 'studio', 'Studio CLI', false, null !== studioVersion, studioVersion || 'not found (recommended, for a persistent test site)' );
 const composerVersion = findVersion( run( 'composer --version --no-ansi' ) );
 addCheck( 'composer', 'Composer', true, null !== composerVersion, composerVersion || 'not found' );
 

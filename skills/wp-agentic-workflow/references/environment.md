@@ -18,16 +18,24 @@ It checks:
 |---|---|---|
 | Git | Version control, release zips (`git archive`) | Yes |
 | Node.js 20.18+ and npm | Playground CLI, asset scripts | Yes |
-| Studio CLI (`studio`) | Persistent test site, WP-CLI (`studio wp`) | Yes (not available on Linux) |
-| PHP CLI 7.4+ | Composer and PHPCS | Yes |
+| PHP CLI 7.4+ | Composer, PHPCS and WP-CLI | Yes |
+| WP-CLI (`wp`), installed as a `.phar` | Tasks on the repo alone (`i18n`), and commands on Playground sites (see `playground.md`) | Yes |
 | Composer | WordPress Coding Standards (PHPCS) | Yes |
+| Studio app and Studio CLI (`studio`) | A persistent test site that stays running with a fixed domain (`studio.md`) | Recommended (not available on Linux) |
 | Subversion (`svn`) | Publishing on WordPress.org | No |
 | Chrome | WordPress.org screenshots and banners, headless browser tests | No |
 | Plugin folder | Folder name = plugin slug (Text Domain) | Yes |
 
 For PHP, also run `php <skill>/scripts/check-php.php`: it checks the version, `php.ini`, the extensions Composer and PHPCS need, and prints the `php.ini` lines to fix.
 
-WP-CLI is not installed separately: it comes with Studio as `studio wp`. For tasks that only need the repo, not a site (for example `i18n make-pot`), use `studio wp --studio-no-path`.
+WP-CLI is used in two ways:
+
+- **On the repo alone**, with no WordPress site: `wp i18n make-pot`, `wp i18n make-json`... Run `wp` from the repo root.
+- **On a site**: on a Playground site through `scripts/playground-wp.mjs`, which mounts WP-CLI's `.phar` into it (see `playground.md`); on a Studio site, `studio wp --path <site>`. Never run a site command (`plugin`, `option`, `post`...) with the plain `wp`: there is no site for it to act on.
+
+The script reads the `.phar` path from `wp --info`. Installs that are not a `.phar` (a package manager's wrapper script, for example) can't be mounted: install the `.phar` as below.
+
+Studio is recommended but not required. If the Studio app or the Studio CLI is missing, say so, explain what it is for (a persistent site that stays running), and offer to guide the developer through installing it. Don't block the work on it.
 
 ## When something is missing
 
@@ -42,8 +50,10 @@ Install commands:
 |---|---|---|---|
 | Git | `winget install --id Git.Git -e` | `xcode-select --install` or `brew install git` | Distribution package (`sudo apt install git`) |
 | Node.js | `winget install --id OpenJS.NodeJS.LTS -e` | `brew install node` | LTS from <https://nodejs.org/> (distribution packages are often too old) |
-| Studio | Installer from <https://developer.wordpress.com/studio/> | Same | Not available: Playground only, and WP-CLI from <https://wp-cli.org/> |
 | PHP | `winget install --id PHP.PHP.NTS.8.4 -e`, then `check-php.php` | `brew install php` | `sudo apt install php-cli php-curl php-mbstring php-xml php-zip` |
+| WP-CLI | Download [`wp-cli.phar`](https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar) to a folder in the PATH, with a `wp.bat` next to it: `@php "%~dp0wp-cli.phar" %*` | `brew install wp-cli` (a `.phar`) | Download `wp-cli.phar`, `chmod +x`, move it to `/usr/local/bin/wp` (<https://wp-cli.org/>) |
+| Studio app | Installer from <https://developer.wordpress.com/studio/> | Same; open it once | Not available: Playground covers every test site |
+| Studio CLI | Turn it on in the Studio app settings | Same, or `curl -fsSL https://wordpress.studio/install.sh \| bash` | Not available |
 | Composer | <https://getcomposer.org/Composer-Setup.exe> (pick the PHP above, add to PATH) | `brew install composer` | <https://getcomposer.org/download/> |
 | Subversion | `winget install --id TortoiseSVN.TortoiseSVN -e`, choosing "command line client tools" in the installer | `brew install subversion` | `sudo apt install subversion` |
 | Chrome | `winget install --id Google.Chrome -e` | Installer | `google-chrome` or `chromium` package |
