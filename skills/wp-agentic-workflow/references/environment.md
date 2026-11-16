@@ -41,7 +41,6 @@ Studio is recommended but not required. If the Studio app or the Studio CLI is m
 
 When a tool fails instead, see "When something fails" in `SKILL.md`.
 
-
 1. List what is missing and what it is needed for.
 2. Ask the developer whether they want the install instructions or want you to install it.
 3. Instructions: give the platform's commands (the script prints them) and **stop until the developer confirms it is done**. Put them in your final message, not between tool calls, so they are not missed. Then check again.
