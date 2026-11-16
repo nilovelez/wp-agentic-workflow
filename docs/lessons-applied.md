@@ -171,6 +171,13 @@ small changes.
   Then `defineWpConfigConsts` alone was blamed, until the minimal
   reproduction without `login` came out clean.
   → `templates/blueprint.json`, `playground.md`; reported as WordPress/wordpress-playground#4615
+- **Log in through the site's own URL.** A Playground started with
+  `--site-url http://<address>:<port>` sets its cookies for that host. Going
+  to `http://127.0.0.1:<port>/wp-login.php` posts the form, but the session
+  doesn't stick and every admin page goes back to the login (Playground's
+  auto-login fails the same way in headless Chrome). Use the same URL that
+  was passed to `--site-url`.
+  → `testing.md` (One site, one address), `playground.md` (From another machine). Reproduced with curl: the login redirects to the `--site-url` address, where the cookies set for `127.0.0.1` are not sent.
 
 ## WordPress.tv: a theme in another repository, linked into Studio (November 2026)
 

@@ -119,4 +119,6 @@ npx @wp-playground/cli@latest server --blueprint ./blueprint.json --mount-dir . 
 
 Then say: "The test site is at `http://<address>:9400/` (admin / password)."
 
-**A site reached by IP over plain HTTP is not a secure context.** Browsers only expose some APIs on HTTPS or `localhost`: `crypto.subtle`, the clipboard API, service workers... On `http://<address>:9400` they are missing, while on a real site with HTTPS they are there, so a bug can show only on the test site, or only in production. If the plugin uses any of them, give it a fallback and also test on `http://127.0.0.1:9400` on this computer (see `testing.md`).
+Test that site through the same URL too, never through `127.0.0.1`: with any other address the login doesn't hold (see "One site, one address" in `testing.md`).
+
+**A site reached by IP over plain HTTP is not a secure context.** Browsers only expose some APIs on HTTPS or `localhost`: `crypto.subtle`, the clipboard API, service workers... On `http://<address>:9400` they are missing, while on a real site with HTTPS they are there, so a bug can show only on the test site, or only in production. If the plugin uses any of them, give it a fallback and also test it on a second Playground of your own, started without `--site-url` on another port, at `http://127.0.0.1:<port>` (see `testing.md`).

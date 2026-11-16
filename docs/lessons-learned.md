@@ -81,12 +81,6 @@ small changes.
   changed string drops its translations in every language. In this theme the
   `style.css` headers (Theme Name, Description, Author, URIs) are translated
   strings too.
-- **Log in through the site's own URL.** A Playground started with
-  `--site-url http://<address>:<port>` sets its cookies for that host. Going
-  to `http://127.0.0.1:<port>/wp-login.php` posts the form, but the session
-  doesn't stick and every admin page goes back to the login (Playground's
-  auto-login fails the same way in headless Chrome). Use the same URL that
-  was passed to `--site-url`.
 - **When a tool is missing or fails, stop and ask.** Here `--studio-no-path`
   failed and, instead of asking, the agent tried to download `wp-cli.phar`
   (blocked by the permission system, by design) and then wrote its own

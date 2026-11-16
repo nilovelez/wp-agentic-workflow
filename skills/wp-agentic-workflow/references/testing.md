@@ -2,6 +2,15 @@
 
 Test on a running site before handing work over: a change that builds and passes WPCS can still fail at runtime. Use Playground unless the test needs Studio (see `playground.md`). Prefer measured results ("the form returned `spam`") to guesses.
 
+## One site, one address
+
+WordPress builds every link, redirect and script URL from the address the site was started with, and sets its login cookies for the address of each request. Reach a site only through that address: on any other one, the login redirects to the site's address, the browser arrives there without the cookie, and every admin page goes back to the login.
+
+- **A site the developer will open** is started with this computer's address (`--site-url`, see "From another machine" in `playground.md`). Test it through that same URL, with curl and in the browser, never through `127.0.0.1`.
+- **A site only for your own tests**, started for a check and stopped afterwards, is started without `--site-url`: its address is `http://127.0.0.1:<port>`. Use another port if the developer's site is running.
+
+WP-CLI through `scripts/playground-wp.mjs` starts no web server and uses no address.
+
 ## With HTTP requests
 
 Most behavior can be tested without a browser: request the page, read what you need, post to the endpoint, check the response. One request per case is quick to repeat after each change. For example, for a form plugin: read the hidden fields from the form page, post to the form's REST endpoint once per case (a human, a bot, a missing field...) and check the status each time.
@@ -17,7 +26,7 @@ For what needs a real browser (JavaScript, dialogs, generated files), write a th
 
 - Don't use `chrome --headless --dump-dom` to test asynchronous code (fetch, image decoding, `canvas.toBlob`): it dumps the page at a different point on each run, which looks like a hang in the code under test. Drive the browser with Playwright or Puppeteer, or connect to Chrome's DevTools Protocol (`--remote-debugging-port`) and poll `Runtime.evaluate` until the page reports it is done.
 - ES modules need the page served over HTTP, not `file://`.
-- Secure-context APIs (`crypto.subtle`, clipboard...) only exist on HTTPS or `localhost`: test those on `http://127.0.0.1:9400`, not on a LAN or Tailscale address.
+- Secure-context APIs (`crypto.subtle`, clipboard...) only exist on HTTPS or `localhost`, not on a LAN or Tailscale address. Test them on a site of your own, started without `--site-url` on another port, at `http://127.0.0.1:<port>` (see "One site, one address").
 
 ## Prove a security fix
 
