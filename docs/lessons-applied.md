@@ -857,3 +857,14 @@ releasing on GitHub and WordPress.org, with the developer away.
 - **First submission.** The automated scan passed on the first try once Plugin
   Check was clean. The manual review queue had about 243 plugins.
   *(Classic Honeypot for CF7 (October 2026))*
+
+### A one-off misunderstanding in a session, not a rule.
+
+- **Don't start test servers unasked.** The agent started a local web server
+  to share a static preview page; the developer could open the file directly
+  through remote desktop and did not want it. Only start a site when asked.
+  *(Cute WP Badges (October 2026))*
+  The agent served a static HTML mockup through a web server instead of
+  saying where the file was. As a rule ("only start a site when asked") it
+  would clash with testing on a running site before handing work over; the
+  agent's own test sites are already stopped after the check (`testing.md`).

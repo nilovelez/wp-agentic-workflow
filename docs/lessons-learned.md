@@ -91,15 +91,6 @@ A plugin that turns CampTix CSV exports into printable PDF badges.
   plugin folder (`sandbox/debug.log`, ignored by Git). Warnings also reached
   the page even with `WP_DEBUG_DISPLAY` off, and broke a CSV download.
 
-## Cute WP Badges (October 2026)
-
-A plugin that will only live on GitHub, never in the WordPress.org directory,
-and that started as a static HTML page before becoming a plugin.
-
-- **Don't start test servers unasked.** The agent started a local web server
-  to share a static preview page; the developer could open the file directly
-  through remote desktop and did not want it. Only start a site when asked.
-
 ## WordPress.tv 27 (October 2026)
 
 An external review (coding standards, security, feature parity) of a block

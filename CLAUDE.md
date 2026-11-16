@@ -19,6 +19,19 @@ Everything here was first validated on a real project: [Classic Honeypot for CF7
 - Missing dependencies are part of the job: detect them, say what is missing and how to install it.
 - Public and shared: write for other developers, not just for Nilo.
 - Personal working habits (milestones, branching style, chat language, project status files) stay out of the skill. They live in the user-level `~/.claude/CLAUDE.md`.
+- Reasons, not laws. Agents apply a rule well in new situations when they know why it exists, and badly when it is a bare prohibition. Every rule in the skill says why.
+
+## Reviewing the inbox
+
+Every lesson that goes into the skill costs something: more to read, more chances of two rules clashing, and less room for the agent's own judgment. Before folding a lesson from `docs/lessons-learned.md` into the skill, check that:
+
+1. It is about the WordPress workflow or its tools, not about the agent's general behavior (that belongs in each developer's `CLAUDE.md`).
+2. It would happen to other developers, not only in one project or one session.
+3. Its cause is understood, not just its symptom. Reproduce it when you can.
+4. It can be written as an explanation, with its reason, rather than as a prohibition.
+5. It doesn't clash with what the skill already says. If it does, rewrite the existing text instead of adding an exception.
+
+A lesson that fails the check goes to "Reviewed, not in the skill" in `docs/lessons-applied.md`, with the reason. Nothing is lost.
 
 ## Conventions of this repo
 
