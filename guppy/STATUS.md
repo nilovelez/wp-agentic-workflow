@@ -2,6 +2,14 @@
 
 The first version of the skill (`SKILL.md`, `references/`, `scripts/` and `templates/`) was merged into `main` on 2026-10-13, after testing each piece on Windows 11 with Classic Honeypot for CF7. It was then tried on Quevedo, an existing plugin, and the findings went to `docs/lessons-learned.md`. The plan from here is ongoing: use the workflow on new projects and fold what each one teaches into the skill. On 2026-10-31 the lessons from Quevedo, Cute WP Badges, Camptix Badge Generator, the Classic Honeypot 1.0.2 release and the Windows shell were reviewed with Nilo and folded in: a new `references/testing.md`, Plugin Check on the extracted zip, the SVN update steps, Tailscale-first site addresses (`scripts/site-address.mjs`), Subversion in `check-env.mjs`, and Studio started only when Playground isn't enough. On 2026-11-04 the environment moved from Windows 11 to a Mac mini (M1): the environment scripts work unchanged on macOS (lessons added); Studio CLI 2.1.1 is installed but not yet tested with the skill, and seven lessons from other projects added since 2026-10-31 are still to be folded in. Plugins only so far; Linux is still untested and themes are not covered (WordPress.tv 27 showed what a theme needs). No blockers.
 
+## Pending tests on Windows
+
+Written on macOS and not yet tested on Windows (there is no Windows machine at hand now):
+
+- `scripts/playground-wp.mjs`: on Windows it runs `npx` through a shell, quoting every argument. Check that WP-CLI arguments with spaces and quotes (for example `eval 'echo "a b";'`) arrive intact.
+- `scripts/check-env.mjs`: the Studio app locations (`%LOCALAPPDATA%\studio\Studio.exe`, `%LOCALAPPDATA%\Programs\Studio\Studio.exe`), and reading the `.phar` path from `wp --info` with a `wp.bat` wrapper.
+- `references/environment.md`: the WP-CLI install on Windows (`wp-cli.phar` plus a `wp.bat`).
+
 ## Log
 
 Newest entries first. One per work session, brief.
