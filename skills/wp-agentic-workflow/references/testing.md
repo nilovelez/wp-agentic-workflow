@@ -27,6 +27,13 @@ Show the problem before fixing it and its absence after. Add a throwaway mu-plug
 
 With `WP_DEBUG_LOG` on (the blueprint template sets it), PHP notices go to `wp-content/debug.log`. In Playground it lives in the virtual file system, not on disk. The quickest way to read it is a throwaway PHP file in the mounted plugin folder that prints it, requested once and deleted right after. On Studio it is a normal file in the site folder.
 
+Filter the log by the plugin's path before judging it. An old WordPress on a recent PHP (for example, WordPress 6.1 on PHP 8.2) fills it with deprecation notices from core itself.
+
+## Check assumptions at the source
+
+- **Before deciding a WordPress site has no API, read its REST index.** `/wp-json/` lists every namespace and route the site exposes, including custom ones.
+- **Check what upstream code does in the code**, not from memory, a backlog note or old documentation. Reading the current file takes a minute and can change the decision.
+
 ## After WordPress or a dependency changes
 
 For a maintenance release, check the plugin against the current WordPress and the current versions of the plugins it depends on:

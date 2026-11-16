@@ -27,6 +27,10 @@ Rules:
   ```
 
   Then check one pretty URL before trusting any test that depends on them.
+- **Every `defineWpConfigConsts` step uses `"method": "rewrite-wp-config"`** (the template does). With the default method, Playground keeps constants in a shared `consts.json` file that each step reads and writes back without a lock. With several workers (the CLI's default), a `login` step followed by `defineWpConfigConsts` can leave that file as invalid JSON, and then none of its constants are defined, including the one that keeps SQLite out of WAL mode: the database ends up "malformed" ([WordPress/wordpress-playground#4615](https://github.com/WordPress/wordpress-playground/issues/4615)). `rewrite-wp-config` writes plain `define()` calls to `wp-config.php` and doesn't touch `consts.json`. Any other step that defines constants carries the same risk.
+- **`preferredVersions` wins over `--php` and `--wp`.** Starting the CLI with `--php` or `--wp` and a blueprint that sets `preferredVersions` runs the blueprint's versions, silently. To test other versions (the minimum supported, the latest), write a throwaway copy of the blueprint with other `preferredVersions` outside the repo, and check the PHP version in the `X-Powered-By` header.
+- **Content seeded on the first request runs more than once.** Playground serves with several workers and the first page load fires several requests, so a "seed if not done yet" check can pass in two of them at once and duplicate every post. Use `add_option()` as a lock: it fails if the option already exists, so only one request seeds.
+- **Seeded data must be complete, as the plugin would store it.** Data created by the blueprint or by a must-use plugin doesn't go through the plugin's own code (sanitizers, defaults, `save_post` handlers): a missing field the plugin always adds can break features later. Check seeded data through the plugin's UI, not only through its REST output.
 
 ## Run it
 
@@ -42,6 +46,8 @@ npx @wp-playground/cli@latest server --blueprint ./blueprint.json --mount-dir . 
 - In Git Bash on Windows, prefix the command with `MSYS_NO_PATHCONV=1` (see `environment.md`).
 - The site is at <http://127.0.0.1:9400>. Login: `admin` / `password`.
 - When you run it as a background task, give it the maximum timeout: with the default it is killed after a short while (30 minutes in Claude Code's case; the maximum is 2 hours).
+
+To test exactly what WordPress.org will get, build the release zip (see `release.md`), extract it outside the repo and mount the extracted folder instead of `.`.
 
 ## Stop it
 

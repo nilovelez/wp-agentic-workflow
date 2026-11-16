@@ -27,9 +27,24 @@ Fix the code, don't silence the rule. When a rule must be ignored, ignore that o
 // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only check, nothing is saved.
 ```
 
+For a block, name the sniff in both `phpcs:disable` and `phpcs:enable`. A bare `// phpcs:enable` turns every rule back on, including those disabled elsewhere in the file.
+
+## Translated strings
+
+Once the plugin is translated on translate.wordpress.org, every changed source string loses its translations in every language. Before each commit that touches strings, compare the POT of the last release with the working tree's:
+
+```bash
+git archive --format=zip --prefix=<slug>/ -o <temp>/<slug>-release.zip <last release tag>
+# Extract it into <temp>.
+studio wp --path <site> i18n make-pot <temp>/<slug> <temp>/release.pot
+studio wp --path <site> i18n make-pot . <temp>/current.pot --exclude=vendor,node_modules
+```
+
+Diff the sorted `msgid` lines of both files. Change a string only when the new wording is worth losing its translations, and say so in the commit.
+
 ## Plugin Check
 
-The official tool of the WordPress.org plugin review team. Run it on what reviewers will get, the release zip, not on the repo: on the repo folder it also flags development files (`.git`, `.claude`, `.github`, `CLAUDE.md`, untracked folders) that never reach the zip.
+The official tool of the WordPress.org plugin review team. Run it on what reviewers will get, the release zip, not on the repo: on the repo folder (including the plugin linked into the Studio site) it also flags development files (`.git`, `.claude`, `.github`, `vendor/`, `CLAUDE.md`, extra Markdown files, untracked folders) that never reach the zip.
 
 It needs a WordPress site with Plugin Check installed, but the site doesn't need to be running, and the plugin doesn't need to be installed in it: `plugin check` accepts a folder path. Use the Studio site:
 

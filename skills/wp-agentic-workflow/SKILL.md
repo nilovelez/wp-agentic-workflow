@@ -15,6 +15,7 @@ One way of developing a WordPress plugin, the same on every project, from the fi
 These are WordPress standards, not preferences. Apply them to every change and point out when existing code doesn't follow them:
 
 - **US English** (en_US, the source locale of WordPress) for code, comments, user-facing strings, the readme and commit messages, whatever language you talk to the developer in.
+- **Translatable from the first line**, in PHP and in JavaScript (`@wordpress/i18n`, `wp_set_script_translations()`). Retrofitting i18n later means going through every component.
 - **Readable, simple code.** A plain loop or `if` over clever closures and one-liners. Don't try to be smart.
 - **WordPress Coding Standards** (PHPCS with WPCS) clean, and **Plugin Check** clean before any release.
 - **The repo holds the plugin** plus its configuration and development files; development files stay out of the release zip.
@@ -31,6 +32,8 @@ Run `node <skill>/scripts/check-env.mjs` from the repo root and read `references
 - If a tool is missing, say what is missing and what for, and ask whether the developer wants instructions or wants you to install it. When the developer has to do something, give the steps in your final message and wait.
 
 ### 2. Set up the repo (once)
+
+For a new plugin, settle the slug first: it is the folder, the text domain and the prefix, and renaming it later touches every file. Search for the name on WordPress.org, on GitHub and in the ecosystem the plugin is for (another plugin's repo, a platform's own code), not only in the plugin directory.
 
 If they don't exist yet, add from `templates/`:
 

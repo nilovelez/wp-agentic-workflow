@@ -32,6 +32,14 @@ studio start --path <site> --skip-browser
 
 Studio updates itself and restarts running sites when it does. The link and the active plugin survive, but check that the site responds before trusting test results run around an update.
 
+## Links and PHP's file access
+
+Studio sites run with `file-access: site-directory` by default: PHP's `open_basedir` covers only the site folder. `studio-site.mjs` creates the site with `all-files`; for an existing site, `studio config set --file-access all-files`. `studio wp` is not restricted, so WP-CLI can see a linked plugin that the web server can't.
+
+On start, Studio adds the targets of the links in the site root and `wp-content` to `open_basedir`. A link added or replaced while the site runs makes Studio restart PHP a moment later, and pages loaded in between can't read the linked folder: WordPress may deactivate the plugin or switch to the default theme. **Change links only with the site stopped**, then start it and check (`wp plugin list`, `wp option get stylesheet`) before loading pages.
+
+When the site and WP-CLI disagree, ask the web server: a throwaway PHP file in the site root that prints what you need (an option, a `realpath()`, `ini_get( 'open_basedir' )`) shows the real state in one request. Delete it afterwards.
+
 ## WP-CLI
 
 ```bash
