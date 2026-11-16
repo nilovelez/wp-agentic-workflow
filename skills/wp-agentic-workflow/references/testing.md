@@ -6,7 +6,7 @@ Test on a running site before handing work over: a change that builds and passes
 
 WordPress builds every link, redirect and script URL from the address the site was started with, and sets its login cookies for the address of each request. Reach a site only through that address: on any other one, the login redirects to the site's address, the browser arrives there without the cookie, and every admin page goes back to the login.
 
-- **A site the developer will open** is started with this computer's address (`--site-url`, see "From another machine" in `playground.md`). Test it through that same URL, with curl and in the browser, never through `127.0.0.1`.
+- **A site the developer will open** is started with this computer's address (`--site-url`, see "Run it" in `playground.md`). Test it through that same URL, with curl and in the browser, never through `127.0.0.1`.
 - **A site only for your own tests**, started for a check and stopped afterwards, is started without `--site-url`: its address is `http://127.0.0.1:<port>`. Use another port if the developer's site is running.
 
 WP-CLI through `scripts/playground-wp.mjs` starts no web server and uses no address.

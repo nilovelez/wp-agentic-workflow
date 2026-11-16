@@ -1,4 +1,4 @@
-# Persistent site with Studio
+# A site that stays running, with Studio
 
 For a site that has to stay running, with a fixed domain (`<slug>.local`): a site to show, to leave open for days, or to connect the MCP Adapter to. The plugin is linked from the repo, so the site always runs the code being edited. For the Studio CLI itself, see the official `studio-cli` skill.
 

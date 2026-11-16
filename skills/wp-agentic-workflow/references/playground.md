@@ -1,4 +1,4 @@
-# Disposable site with Playground
+# Test sites with Playground
 
 Playground covers almost every test site the plugin needs, in three ways:
 
@@ -43,15 +43,27 @@ Rules:
 
 Check that port 9400 is free first: if another Playground (from another session, say) is using it, a new one silently picks another port. On Windows, `Get-NetTCPConnection -LocalPort 9400 -State Listen`; on macOS/Linux, `lsof -i :9400`. If it is taken, pass `--port=<free port>` (and use that port in `--site-url`).
 
-From the repo root:
+A site has one address, the one it is started with: WordPress builds every link and redirect from it, and the login only holds on it (see "One site, one address" in `testing.md`). So decide first who the site is for.
+
+**A site for the developer**, who may be working from another computer. Playground listens on all interfaces, so start it with the address of this computer that the other one can reach:
 
 ```bash
-npx @wp-playground/cli@latest server --blueprint ./blueprint.json --mount-dir . /wordpress/wp-content/plugins/<slug>
+node <skill>/scripts/site-address.mjs
 ```
+
+It prints this computer's Tailscale IP if Tailscale is running (the developer probably connects through it), otherwise its LAN IP. Run it every time: addresses can change. Then, from the repo root:
+
+```bash
+npx @wp-playground/cli@latest server --blueprint ./blueprint.json --mount-dir . /wordpress/wp-content/plugins/<slug> --site-url http://<address>:9400
+```
+
+Say: "The test site is at `http://<address>:9400/` (admin / password)." Test it through that same URL too, never through `127.0.0.1`.
+
+**A site only for your own tests**, started for a check and stopped afterwards: the same command without `--site-url`. Its address is `http://127.0.0.1:9400` (or the port you pass), and it is a secure context (see below).
 
 - `--mount-dir <host> <vfs>` instead of `--mount <host>:<vfs>`: on Windows `--mount` rejects drive-letter paths, and `--mount-dir` works everywhere (relative paths too).
 - In Git Bash on Windows, prefix the command with `MSYS_NO_PATHCONV=1` (see `environment.md`).
-- The site is at <http://127.0.0.1:9400>. Login: `admin` / `password`.
+- Login: `admin` / `password`.
 - When you run it as a background task, give it the maximum timeout: with the default it is killed after a short while (30 minutes in Claude Code's case; the maximum is 2 hours).
 
 To test exactly what WordPress.org will get, build the release zip (see `release.md`), extract it outside the repo and mount the extracted folder instead of `.`.
@@ -79,7 +91,7 @@ Then serve it whenever needed, mounting the folder **before install** (a plain `
 npx @wp-playground/cli@latest server --mount-dir-before-install <site folder> /wordpress --wordpress-install-mode=install-from-existing-files-if-needed --mount-dir . /wordpress/wp-content/plugins/<slug>
 ```
 
-Don't pass the blueprint again: it was applied when the site was created, and running it twice would repeat its steps. To start over, delete the folder.
+For the developer, add `--site-url http://<address>:9400`, as in "Run it". Don't pass the blueprint again: it was applied when the site was created, and running it twice would repeat its steps. To start over, delete the folder.
 
 Don't use the CLI's `start` command for this: it keeps its sites in the home folder (`~/.wordpress-playground/sites/`).
 
@@ -103,22 +115,6 @@ node <skill>/scripts/playground-wp.mjs --plugin-check
 - Changes made with WP-CLI on a persistent site show on its running server straight away.
 - Constants are only visible to WP-CLI if the blueprint writes them to `wp-config.php` (`"method": "rewrite-wp-config"`, see the rules above). Check them with `wp eval 'var_dump( WP_DEBUG );'`: `wp config get` doesn't find them on Playground.
 
-## From another machine
-
-The developer may be working from another computer. Playground already listens on all interfaces, but WordPress redirects to the URL it was started with, so start it with the address of this computer that the other one can reach:
-
-```bash
-node <skill>/scripts/site-address.mjs
-```
-
-It prints this computer's Tailscale IP if Tailscale is running (the developer probably connects through it), otherwise its LAN IP. Run it every time: addresses can change.
-
-```bash
-npx @wp-playground/cli@latest server --blueprint ./blueprint.json --mount-dir . /wordpress/wp-content/plugins/<slug> --site-url http://<address>:9400
-```
-
-Then say: "The test site is at `http://<address>:9400/` (admin / password)."
-
-Test that site through the same URL too, never through `127.0.0.1`: with any other address the login doesn't hold (see "One site, one address" in `testing.md`).
+## Secure context
 
 **A site reached by IP over plain HTTP is not a secure context.** Browsers only expose some APIs on HTTPS or `localhost`: `crypto.subtle`, the clipboard API, service workers... On `http://<address>:9400` they are missing, while on a real site with HTTPS they are there, so a bug can show only on the test site, or only in production. If the plugin uses any of them, give it a fallback and also test it on a second Playground of your own, started without `--site-url` on another port, at `http://127.0.0.1:<port>` (see `testing.md`).

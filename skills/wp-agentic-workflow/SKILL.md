@@ -52,7 +52,7 @@ Three tools, from lightest to heaviest. Sites log in with `admin` / `password`.
 - **Playground**, for almost everything: a disposable site for day-to-day development and testing, a persistent site kept outside the repo when data has to survive, and WP-CLI on either one, Plugin Check included, without a web server (`scripts/playground-wp.mjs`). `references/playground.md`.
 - **Studio**, recommended but optional, only for a site that has to stay running with a fixed domain (to show, to leave open, for the MCP Adapter). Starting it needs the developer at the computer. `references/studio.md` and, optionally, `references/mcp-adapter.md`.
 
-**Always say where the test site is.** The developer is often at another computer, not the one running Claude Code. Get this computer's address with `node <skill>/scripts/site-address.mjs` every time a site starts (the Tailscale IP if Tailscale is running, otherwise the LAN IP). Give the site's URL and, for a Studio domain, the hosts line for other computers:
+**Always say where the developer's test site is.** The developer is often at another computer, not the one running Claude Code. Every time a site starts for the developer, get this computer's address with `node <skill>/scripts/site-address.mjs` (the Tailscale IP if Tailscale is running, otherwise the LAN IP). Give the site's URL and, for a Studio domain, the hosts line for other computers. Sites you start only for your own tests run on `127.0.0.1` and are not given to anyone (see "One site, one address" in `references/testing.md`).
 
 > The test site is at http://my-plugin.local/ (admin / password). From another computer, add `100.101.102.103 my-plugin.local` to its hosts file.
 
