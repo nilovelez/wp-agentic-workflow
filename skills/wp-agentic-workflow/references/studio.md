@@ -1,8 +1,8 @@
 # Persistent site with Studio
 
-For a test site that stays: WP-CLI and Plugin Check (both work with the site stopped), and, when started, data that survives between sessions, a fixed URL and the MCP Adapter. The plugin is linked from the repo, so the site always runs the code being edited. For the Studio CLI itself, see the official `studio-cli` skill.
+For a site that has to stay running, with a fixed domain (`<slug>.local`): a site to show, to leave open for days, or to connect the MCP Adapter to. The plugin is linked from the repo, so the site always runs the code being edited. For the Studio CLI itself, see the official `studio-cli` skill.
 
-**Start it only when something needs testing that Playground can't cover** (persistent data, a fixed domain, the MCP Adapter...). For everything else, use Playground (`playground.md`).
+Studio is recommended, not required. Playground covers everything else, persistent data and WP-CLI included (`playground.md`), and Plugin Check (`quality.md`). Use Studio only when the developer wants a site that stays up, and say first that starting it needs them at the computer (see "Start it").
 
 ## Create it
 
@@ -30,7 +30,11 @@ Starting the site writes `<slug>.local` to the hosts file, which can ask for con
 studio start --path <site> --skip-browser
 ```
 
+On macOS, ask the developer to run the first start in their own terminal. Started by the agent, the administrator prompt appeared but rejected the developer's correct credentials, and Studio reported "User did not grant permission".
+
 Studio updates itself and restarts running sites when it does. The link and the active plugin survive, but check that the site responds before trusting test results run around an update.
+
+Updating the Studio app doesn't update the Studio CLI. After an app update, compare `studio --version` with the app's version; to update the CLI on macOS, `curl -fsSL https://wordpress.studio/install.sh | bash` (the command the CLI's own update notice gives).
 
 ## Links and PHP's file access
 

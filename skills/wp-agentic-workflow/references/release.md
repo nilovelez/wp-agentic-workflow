@@ -17,13 +17,13 @@ To ship only part of an ignored folder, ignore the folder and then un-ignore wha
 
 ## Translations
 
-Plugins hosted on WordPress.org are translated on translate.wordpress.org and get language packs from there. They don't need a `languages/` folder, a `Domain Path` header or a `load_plugin_textdomain()` call. To see whether a plugin already has language packs: `https://api.wordpress.org/translations/plugins/1.0/?slug=<slug>`. To check the strings, generate a POT without a site:
+Plugins hosted on WordPress.org are translated on translate.wordpress.org and get language packs from there. They don't need a `languages/` folder, a `Domain Path` header or a `load_plugin_textdomain()` call. To see whether a plugin already has language packs: `https://api.wordpress.org/translations/plugins/1.0/?slug=<slug>`. To check the strings, generate a POT outside the repo, with the plain `wp` (no site needed):
 
 ```bash
-studio wp --studio-no-path i18n make-pot . <slug>.pot
+wp i18n make-pot . <temp>/<slug>.pot --exclude=vendor,node_modules
 ```
 
-(Delete the `.pot` afterwards, or keep it out of the zip.)
+The POT is only for checking: the plugin doesn't ship it. Once the plugin has translations, compare the strings before each change (see "Translated strings" in `quality.md`).
 
 ## Build the zip
 

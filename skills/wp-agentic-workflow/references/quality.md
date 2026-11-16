@@ -34,11 +34,13 @@ For a block, name the sniff in both `phpcs:disable` and `phpcs:enable`. A bare `
 Once the plugin is translated on translate.wordpress.org, every changed source string loses its translations in every language. Before each commit that touches strings, compare the POT of the last release with the working tree's:
 
 ```bash
-git archive --format=zip --prefix=<slug>/ -o <temp>/<slug>-release.zip <last release tag>
-# Extract it into <temp>.
-studio wp --path <site> i18n make-pot <temp>/<slug> <temp>/release.pot
-studio wp --path <site> i18n make-pot . <temp>/current.pot --exclude=vendor,node_modules
+git archive --format=tar --prefix=<slug>/ -o <temp>/<slug>-release.tar <last release tag>
+tar -xf <temp>/<slug>-release.tar -C <temp>
+wp i18n make-pot <temp>/<slug> <temp>/release.pot
+wp i18n make-pot . <temp>/current.pot --exclude=vendor,node_modules
 ```
+
+`i18n make-pot` only reads files: the plain `wp`, with no site (see `environment.md`). `<temp>` is a folder outside the repo.
 
 Diff the sorted `msgid` lines of both files. Change a string only when the new wording is worth losing its translations, and say so in the commit.
 
@@ -46,21 +48,17 @@ Diff the sorted `msgid` lines of both files. Change a string only when the new w
 
 The official tool of the WordPress.org plugin review team. Run it on what reviewers will get, the release zip, not on the repo: on the repo folder (including the plugin linked into the Studio site) it also flags development files (`.git`, `.claude`, `.github`, `vendor/`, `CLAUDE.md`, extra Markdown files, untracked folders) that never reach the zip.
 
-It needs a WordPress site with Plugin Check installed, but the site doesn't need to be running, and the plugin doesn't need to be installed in it: `plugin check` accepts a folder path. Use the Studio site:
+It needs a WordPress site with Plugin Check installed, but not a running one, and the plugin doesn't need to be installed in it: `plugin check` accepts a folder path. From the repo root:
 
 ```bash
-studio wp --path <site> plugin install plugin-check --activate
+node <skill>/scripts/playground-wp.mjs --plugin-check
 ```
 
-Then, from the repo root, build the zip (see `release.md`), extract it to a temporary folder outside the repo, and check that folder:
-
-```bash
-git archive --format=zip --prefix=<slug>/ -o <temp>/<slug>.zip HEAD
-# Extract <temp>/<slug>.zip into <temp> (Expand-Archive on Windows, unzip elsewhere).
-studio wp --path <site> plugin check <temp>/<slug> --include-experimental
-```
+It builds the release with `git archive HEAD`, extracts it to a temporary folder outside the repo (`--temp <folder>` to choose it), and runs `plugin check <folder> --include-experimental` on a disposable Playground site that has Plugin Check installed. Extra arguments for `plugin check` go after `--` (for example `-- --format=csv`). It takes about 20 seconds.
 
 `git archive` takes committed files only: commit first.
+
+On a Studio site, the same check is `studio wp --path <site> plugin check <extracted release folder> --include-experimental`, with Plugin Check installed there (`studio wp --path <site> plugin install plugin-check --activate`).
 
 With WPCS clean, Plugin Check usually finds little. A common one: `load_plugin_textdomain()` is not needed for a plugin hosted on WordPress.org (see "Translations" in `release.md`).
 

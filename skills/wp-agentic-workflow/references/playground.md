@@ -1,6 +1,12 @@
 # Disposable site with Playground
 
-For day-to-day development and most testing: a fresh WordPress in seconds, with the plugin mounted from the repo. Nothing persists between runs unless you ask for it. For the Playground CLI itself (flags, snapshots, Xdebug), see the official `wp-playground` skill; for Blueprint syntax, the `blueprint` skill.
+Playground covers almost every test site the plugin needs, in three ways:
+
+- **A disposable site**, with a web server: a fresh WordPress in seconds, with the plugin mounted from the repo. Nothing persists between runs. For day-to-day development and most testing ("Run it" below).
+- **A persistent site**, with a web server: the same, but WordPress and its database are kept in a folder outside the repo and survive between runs ("Keep a site between runs").
+- **WP-CLI without a web server**, on a disposable or a persistent site, including Plugin Check ("WP-CLI").
+
+Use Studio only for a site that has to stay running with a fixed domain (`studio.md`). For the Playground CLI itself (flags, snapshots, Xdebug), see the official `wp-playground` skill; for Blueprint syntax, the `blueprint` skill.
 
 ## The blueprint
 
@@ -17,6 +23,7 @@ Rules:
 
 - Make `runPHP` steps idempotent (check before creating), so the same blueprint can run on a site that already has the content.
 - Steps that create test content must not depend on the plugin being active: on Studio the plugin is activated after the blueprint runs (see `studio.md`).
+- The blueprint is applied when a site is created, not on every run of a persistent site: changes to it need a new site.
 - Playground can't send email. If the plugin sends mail (or depends on one that does, like Contact Form 7), configure the test content so it doesn't need to (in Contact Form 7: `skip_mail: on` in the form's additional settings).
 - **Pretty permalinks need a `runPHP` step.** Setting the `permalink_structure` option (`setSiteOptions`) saves the option but not the rewrite rules, and every pretty URL then silently serves the home page with a 200. Set the structure in a `runPHP` step:
 
@@ -55,6 +62,46 @@ Stopping the background task may not stop Playground: on Windows, the `node` pro
 
 - Windows (PowerShell): `Get-CimInstance Win32_Process -Filter "Name='node.exe'" | Where-Object CommandLine -like '*plugins/<slug>*' | ForEach-Object { Stop-Process -Id $_.ProcessId }`
 - macOS/Linux: `pkill -f 'plugins/<slug>'`
+
+## Keep a site between runs
+
+When test data has to survive a restart, keep the site in a folder outside the repo (a scratch or temporary folder; never inside the repo). WordPress and its SQLite database then live on disk in that folder.
+
+Create it once, with WP-CLI's helper (see "WP-CLI" below): when the folder is empty, it installs WordPress there and applies the blueprint.
+
+```bash
+node <skill>/scripts/playground-wp.mjs --site <site folder> -- option get siteurl
+```
+
+Then serve it whenever needed, mounting the folder **before install** (a plain `--mount-dir` can't open the database):
+
+```bash
+npx @wp-playground/cli@latest server --mount-dir-before-install <site folder> /wordpress --wordpress-install-mode=install-from-existing-files-if-needed --mount-dir . /wordpress/wp-content/plugins/<slug>
+```
+
+Don't pass the blueprint again: it was applied when the site was created, and running it twice would repeat its steps. To start over, delete the folder.
+
+Don't use the CLI's `start` command for this: it keeps its sites in the home folder (`~/.wordpress-playground/sites/`).
+
+## WP-CLI
+
+A plain `server` site lives in the memory of its process: no other process can reach it. WP-CLI runs instead through the Playground CLI's `php` command, which builds a site, runs one PHP script in it and exits, with no web server. `scripts/playground-wp.mjs` does it with WP-CLI's `.phar` (it must be installed, see `environment.md`), from the repo root:
+
+```bash
+# A disposable site, from the repo's blueprint, with the plugin mounted.
+node <skill>/scripts/playground-wp.mjs -- plugin list
+
+# The persistent site in <site folder>. It also works while a server is running on it.
+node <skill>/scripts/playground-wp.mjs --site <site folder> -- option update blogname "Test"
+
+# Plugin Check on the release (see quality.md).
+node <skill>/scripts/playground-wp.mjs --plugin-check
+```
+
+- Everything after `--` goes to WP-CLI as is.
+- Each run builds the site: about 15 seconds for a disposable site, about 5 for a persistent one.
+- Changes made with WP-CLI on a persistent site show on its running server straight away.
+- Constants are only visible to WP-CLI if the blueprint writes them to `wp-config.php` (`"method": "rewrite-wp-config"`, see the rules above). Check them with `wp eval 'var_dump( WP_DEBUG );'`: `wp config get` doesn't find them on Playground.
 
 ## From another machine
 

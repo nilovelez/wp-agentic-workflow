@@ -1,7 +1,7 @@
 ---
 name: wp-agentic-workflow
-description: "Use for any work on a WordPress plugin repository, however small: starting or continuing development (\"we're working on a WordPress plugin\"), a one-line fix, addressing a WordPress.org review, or preparing a new version. Load it before changing plugin code. It checks and installs the development tools, sets up test sites (disposable with Playground, persistent with Studio), enforces WordPress coding standards (WPCS, Plugin Check), and takes the plugin to a WordPress.org release (zip, assets, submission). Opinionated glue on top of the official WordPress agent skills."
-compatibility: "WordPress plugins (themes not covered yet). Node.js 20.18+, WordPress Studio CLI, PHP 7.4+ and Composer. Validated on Windows 11; macOS and Linux untested."
+description: "Use for any work on a WordPress plugin repository, however small: starting or continuing development (\"we're working on a WordPress plugin\"), a one-line fix, addressing a WordPress.org review, or preparing a new version. Load it before changing plugin code. It checks and installs the development tools, sets up test sites and runs WP-CLI on them (Playground, and Studio for a site that stays running), enforces WordPress coding standards (WPCS, Plugin Check), and takes the plugin to a WordPress.org release (zip, assets, submission). Opinionated glue on top of the official WordPress agent skills."
+compatibility: "WordPress plugins (themes not covered yet). Node.js 20.18+, PHP 7.4+, Composer and WP-CLI; WordPress Studio recommended. Validated on Windows 11 and macOS; Linux untested."
 ---
 
 # WordPress plugin workflow
@@ -45,10 +45,11 @@ Adapt them to the plugin (slug, text domain, prefix, dependencies). Don't overwr
 
 ### 3. Test sites
 
-Two kinds, both with login `admin` / `password`:
+Three tools, from lightest to heaviest. Sites log in with `admin` / `password`.
 
-- **Playground**, disposable, for day-to-day development and most testing: `references/playground.md`.
-- **Studio**, persistent, with the plugin linked from the repo. WP-CLI and Plugin Check run on it with the site stopped. **Start it only when something needs testing that Playground can't cover** (persistent data, a fixed domain, the MCP Adapter...). `references/studio.md` and, optionally, `references/mcp-adapter.md`.
+- **WP-CLI alone**, with no site, for tasks that only read the repo (`wp i18n make-pot`): `references/environment.md`.
+- **Playground**, for almost everything: a disposable site for day-to-day development and testing, a persistent site kept outside the repo when data has to survive, and WP-CLI on either one, Plugin Check included, without a web server (`scripts/playground-wp.mjs`). `references/playground.md`.
+- **Studio**, recommended but optional, only for a site that has to stay running with a fixed domain (to show, to leave open, for the MCP Adapter). Starting it needs the developer at the computer. `references/studio.md` and, optionally, `references/mcp-adapter.md`.
 
 **Always say where the test site is.** The developer is often at another computer, not the one running Claude Code. Get this computer's address with `node <skill>/scripts/site-address.mjs` every time a site starts (the Tailscale IP if Tailscale is running, otherwise the LAN IP). Give the site's URL and, for a Studio domain, the hosts line for other computers:
 
@@ -60,7 +61,7 @@ Test changes on a running site before handing them over, with HTTP requests or a
 
 ### 5. Quality
 
-Before every commit that touches PHP: `composer lint`. Before any release: Plugin Check on the extracted release zip. Details in `references/quality.md`.
+Before every commit that touches PHP: `composer lint`. Before any release: Plugin Check on the extracted release zip (`node <skill>/scripts/playground-wp.mjs --plugin-check`). Details in `references/quality.md`.
 
 ### 6. Release
 
@@ -80,4 +81,5 @@ Install them with `npx skills add WordPress/agent-skills -g -a claude-code`. Rea
 ## Not covered yet
 
 - Themes: only plugins have been tested.
-- macOS and Linux: the commands follow each tool's documentation but have only been tested on Windows 11. Studio is not available on Linux.
+- Linux: the commands follow each tool's documentation but have only been tested on Windows 11 and macOS. Studio is not available on Linux; Playground covers every test site there.
+- `scripts/playground-wp.mjs` was written on macOS and is not yet tested on Windows.

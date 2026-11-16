@@ -42,6 +42,15 @@ Playground CLI 3.1.65, WP-CLI 2.12.0 and Classic Honeypot for CF7.
 - **Constants from the blueprint don't reach WP-CLI** when they are defined
   the default way: they live in Playground's `consts.json`, not in
   `wp-config.php`, so the stored site had `WP_DEBUG` false.
+- **With `"method": "rewrite-wp-config"` the constants do reach WP-CLI.**
+  `wp eval 'var_dump( WP_DEBUG );'` showed them true, but `wp config get
+  WP_DEBUG` said it wasn't defined in `wp-config.php`, though the file had
+  it. Check constants with `eval` on Playground.
+- **WP-CLI writing while the server works didn't corrupt anything.** With
+  the corrected blueprint, 25 posts created by WP-CLI in five rounds while
+  four loops made about 290 requests to the running site: no errors in the
+  server log, `PRAGMA integrity_check` "ok" on a copy of the database, and
+  journal mode `delete`.
 - **Homebrew's `wp` is the `.phar` itself**, with a `#!` line: it can be
   mounted into Playground as is. `wp --info --format=json` gives the `.phar`
   path (`wp_cli_phar_path`) on any platform.

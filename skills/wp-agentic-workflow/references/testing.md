@@ -25,7 +25,7 @@ Show the problem before fixing it and its absence after. Add a throwaway mu-plug
 
 ## Read the debug log
 
-With `WP_DEBUG_LOG` on (the blueprint template sets it), PHP notices go to `wp-content/debug.log`. In Playground it lives in the virtual file system, not on disk. The quickest way to read it is a throwaway PHP file in the mounted plugin folder that prints it, requested once and deleted right after. On Studio it is a normal file in the site folder.
+With `WP_DEBUG_LOG` on (the blueprint template sets it), PHP notices go to `wp-content/debug.log`. On a disposable Playground site it lives in the virtual file system, not on disk: the quickest way to read it is a throwaway PHP file in the mounted plugin folder that prints it, requested once and deleted right after. On a persistent Playground site and on Studio it is a normal file in the site folder.
 
 Filter the log by the plugin's path before judging it. An old WordPress on a recent PHP (for example, WordPress 6.1 on PHP 8.2) fills it with deprecation notices from core itself.
 
@@ -39,4 +39,4 @@ Filter the log by the plugin's path before judging it. An old WordPress on a rec
 For a maintenance release, check the plugin against the current WordPress and the current versions of the plugins it depends on:
 
 - **Test old features against the current WordPress**, not the one they were written for. Core changes under old code: since 6.4 new sites redirect attachment pages to the file, since 6.1 lists are made of `core/list-item` blocks.
-- **Diff the dependency, don't trust its changelog.** Copy the dependency's folder from the Studio site, update it (`studio wp plugin update <dependency>`), and compare the two folders with `git diff --no-index --stat <old> <new>`. Then search the plugin for every function, hook and class of the dependency it uses, and read only the diffs that could touch them.
+- **Diff the dependency, don't trust its changelog.** On a persistent Playground site (see `playground.md`), copy the dependency's folder from `<site folder>/wp-content/plugins/<dependency>`, update it (`node <skill>/scripts/playground-wp.mjs --site <site folder> -- plugin update <dependency>`), and compare the two folders with `git diff --no-index --stat <old> <new>`. Then search the plugin for every function, hook and class of the dependency it uses, and read only the diffs that could touch them.

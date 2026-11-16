@@ -2,7 +2,7 @@
 
 An opinionated skill for [Claude Code](https://claude.com/claude-code) to develop WordPress plugins: it checks the tools, sets up local sites and follows the same workflow on every project, from the first line of code to the WordPress.org submission.
 
-**Status: first version.** The workflow was validated on one real plugin, [Classic Honeypot for CF7](https://github.com/nilovelez/classic-honeypot-for-cf7), from development to WordPress.org submission. Plugins only, tested on Windows 11; macOS and Linux are untested and themes are not covered yet.
+**Status: first version.** The workflow was validated on one real plugin, [Classic Honeypot for CF7](https://github.com/nilovelez/classic-honeypot-for-cf7), from development to WordPress.org submission. Plugins only, tested on Windows 11 and macOS; Linux is untested and themes are not covered yet.
 
 ## Install
 
@@ -27,7 +27,7 @@ Updated skills are loaded when a new Claude Code session starts.
 
 ## Approach
 
-- **Official tools and practices.** [WordPress Playground](https://wordpress.org/playground/) and Blueprints for disposable sites, [WordPress Studio](https://developer.wordpress.com/studio/) for a persistent test site, WP-CLI, the WordPress Coding Standards and Plugin Check. It follows what WordPress recommends at the moment, and changes when that changes.
+- **Official tools and practices.** [WordPress Playground](https://wordpress.org/playground/) and Blueprints for almost every test site, WP-CLI (also run on Playground sites), [WordPress Studio](https://developer.wordpress.com/studio/) for a site that stays running, the WordPress Coding Standards and Plugin Check. It follows what WordPress recommends at the moment, and changes when that changes.
 - **Built on the official skills.** It relies on [WordPress/agent-skills](https://github.com/WordPress/agent-skills) and only adds the glue between them and a few opinions.
 - **Opinionated, not configurable.** One way of working, the same on every project.
 
