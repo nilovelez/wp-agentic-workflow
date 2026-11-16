@@ -7,7 +7,8 @@ Everything here was first validated on a real project: [Classic Honeypot for CF7
 ## Where things are
 
 - `skills/wp-agentic-workflow/`: the skill (`SKILL.md`, `references/`, `scripts/`, `templates/`), with the same layout as [WordPress/agent-skills](https://github.com/WordPress/agent-skills) so it installs the same way: `npx skills add nilovelez/wp-agentic-workflow -g -a claude-code`. It is the source of truth of the workflow.
-- `docs/lessons-learned.md`: lessons learned, including dead ends and wrong assumptions. Public; it also feeds an article and a talk about starting WordPress development with Claude. Add new lessons as they happen.
+- `docs/lessons-learned.md`: the inbox of lessons, including dead ends and wrong assumptions. Sessions working on any project add new lessons here as they happen; nothing in it is reviewed yet, and some of it may be wrong.
+- `docs/lessons-applied.md`: lessons that were reviewed. When a lesson is folded into the skill, move it here with where it went (→); when it is reviewed and left out, move it to "Reviewed, not in the skill" with the reason. Public; with the inbox, it feeds an article and a talk about starting WordPress development with Claude.
 - `docs/handoff.md`: what was first validated on Classic Honeypot for CF7, before the skill existed. Kept as a record; open items are at the end.
 
 ## Principles of the skill

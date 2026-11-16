@@ -6,7 +6,7 @@ Everything learned while building and releasing
 context. The skill in `skills/wp-agentic-workflow/` replaced it as the source
 of truth in October 2026; this file stays as the record of what was validated
 first, and some of it was corrected while writing the skill (see the notes
-below and `docs/lessons-learned.md`).
+below and `docs/lessons-applied.md`).
 
 ## Goal and principles
 

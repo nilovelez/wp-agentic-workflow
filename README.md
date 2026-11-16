@@ -34,7 +34,8 @@ Updated skills are loaded when a new Claude Code session starts.
 ## What's here
 
 - [`skills/wp-agentic-workflow/`](skills/wp-agentic-workflow/): the skill: `SKILL.md`, `references/`, `scripts/` and `templates/`.
-- [`docs/lessons-learned.md`](docs/lessons-learned.md): lessons learned along the way, including dead ends.
+- [`docs/lessons-learned.md`](docs/lessons-learned.md): new lessons from the projects, not reviewed yet.
+- [`docs/lessons-applied.md`](docs/lessons-applied.md): lessons learned along the way, including dead ends, and where each one went in the skill.
 - [`docs/handoff.md`](docs/handoff.md): what was first validated on Classic Honeypot for CF7, before the skill existed.
 
 ## License
