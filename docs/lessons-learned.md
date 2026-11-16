@@ -509,8 +509,8 @@ and that started as a static HTML page before becoming a plugin.
 ## The Bash tool and shell quirks (October 2026)
 
 Found while working on a plain PHP project, but it applies to any project
-where the agent runs commands through Claude Code. The first two points
-happen on Windows and on macOS; the last two are Windows only.
+where the agent runs commands through Claude Code. Every point is Windows
+only, except the correction about macOS.
 
 - **The Bash tool halves backslashes.** Claude Code's Bash tool loses half
   the backslashes before the shell sees the command: `echo 'a\\b'` prints
@@ -518,9 +518,15 @@ happen on Windows and on macOS; the last two are Windows only.
   same. It was found on Windows, in Git Bash, and it looked like a Git Bash
   problem. It wasn't: bash 5.3 has no rc files, no `BASH_ENV`, and `posix`
   and `xpg_echo` are off, the same text run from a `.sh` file keeps its
-  backslashes, and reinstalling Git (2.55 to 2.56) changed nothing. Moving
-  to a Mac gave the same result, so the loss happens in how the tool hands
-  the command to the shell, not in any one shell. Reported to Anthropic.
+  backslashes, and reinstalling Git (2.55 to 2.56) changed nothing. Reported
+  to Anthropic.
+- **Correction: on macOS it was zsh's `echo`, not the tool.** After the move
+  to a Mac, `echo 'a\\b'` printed `a\b` again and the problem was taken as
+  the same one. It isn't: the Bash tool runs zsh there, and zsh's `echo`
+  interprets backslash sequences by itself. In the same tool, `printf '%s\n'
+  'c\\d'` prints `c\\d` and a quoted heredoc keeps both backslashes, so the
+  text reaches the shell intact. Test this kind of thing with `printf '%s'`,
+  never with `echo`, whose behavior changes from shell to shell.
 - **What to do instead.** Create files with the Write and Edit tools, never
   with `echo` or heredocs. For a helper script, write it to a file and run it
   with its path. The PowerShell tool passes the same text intact. A tell-tale

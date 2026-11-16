@@ -78,4 +78,8 @@ If you do use Git Bash:
 - **Git Bash rewrites Unix-looking arguments into Windows paths**: `/wordpress/...` becomes `C:/Program Files/Git/wordpress/...`. Prefix Playground commands with `MSYS_NO_PATHCONV=1`, or use PowerShell.
 - **PowerShell pipes corrupt binary output**: write to a file instead (`git archive -o file.zip`, not `git archive | ...`).
 
-macOS and Linux paths in this skill follow the documentation of each tool but have not been tested yet.
+## macOS shell
+
+On macOS the Bash tool runs zsh, and backslashes reach it intact. But zsh's `echo` interprets backslash sequences: `echo 'a\\b'` prints `a\b`. To print exact text use `printf '%s\n' '...'`; to write files, the Write and Edit tools, as on Windows.
+
+Linux paths in this skill follow the documentation of each tool but have not been tested yet.
