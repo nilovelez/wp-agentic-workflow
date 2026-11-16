@@ -34,6 +34,14 @@ This applies to plugins and themes published on WordPress.org, as the project's 
 
 In a plugin that is not published, strings change freely.
 
+## When something fails
+
+Your code failing a test is normal work: fix the code and go on. Stop when going on would need something else: another tool, a script to replace one that failed, a change to settings, files or folders outside your task. A command that errors, an option that no longer exists or a site that doesn't respond as documented are the usual signs.
+
+Stopping doesn't mean doing nothing: look at logs, versions and help pages to understand what happened, since that changes nothing. Then tell the developer what failed, with the error and what you found, and let them decide. Fixes that this skill documents (a `php.ini` line from `check-php.php`, another port when 9400 is taken) are not workarounds: apply them.
+
+The urge to keep going is strongest right then, and a workaround looks like progress. But it hides the real cause, can leave the project in a state the developer didn't choose, and the developer may not be watching to stop it.
+
 ## Procedure
 
 ### 1. Check the environment
@@ -42,7 +50,6 @@ Run `node <skill>/scripts/check-env.mjs` from the repo root and read `references
 
 - If the folder name doesn't match the plugin slug, stop and give rename instructions.
 - If a tool is missing, say what is missing and what for, and ask whether the developer wants instructions or wants you to install it. When the developer has to do something, give the steps in your final message and wait.
-- If a tool fails or a step gives an unexpected result, stop, say what failed and ask. Don't work around it with other tools, scripts of your own or changes to the developer's folders.
 
 ### 2. Set up the repo (once)
 

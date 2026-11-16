@@ -37,11 +37,10 @@ The script reads the `.phar` path from `wp --info`. Installs that are not a `.ph
 
 Studio is recommended but not required. If the Studio app or the Studio CLI is missing, say so, explain what it is for (a persistent site that stays running), and offer to guide the developer through installing it. Don't block the work on it.
 
-## When something is missing or fails
+## When something is missing
 
-When a tool is installed but fails, or a step gives an unexpected result, stop at that first unexpected result. Say what failed, with the error, find the cause if you can, and ask the developer how to go on. Don't work around it: no other tools downloaded, no scripts of your own to replace the one that failed, no changes to the developer's folder layout or environment to make it work. A workaround can hide the real cause and leave the project in a state the developer didn't choose.
+When a tool fails instead, see "When something fails" in `SKILL.md`.
 
-When a tool is missing:
 
 1. List what is missing and what it is needed for.
 2. Ask the developer whether they want the install instructions or want you to install it.
