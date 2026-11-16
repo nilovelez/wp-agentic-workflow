@@ -5,6 +5,59 @@ assumptions. They feed the skill, and an article and a talk about starting
 WordPress development with Claude. Add new ones as they happen, newest
 project first.
 
+## WP-CLI on Playground instead of Studio (November 2026)
+
+`studio wp --studio-no-path` stopped working in Studio CLI 2.x, which left
+no way to run WP-CLI without a site. Looking for a replacement showed that
+Playground can do most of what Studio was used for. Tested on macOS with
+Playground CLI 3.1.65, WP-CLI 2.12.0 and Classic Honeypot for CF7.
+
+- **The Playground CLI has a `php` command.** It builds a WordPress site
+  like `server` does (blueprint, mounts, SQLite), runs `php <arguments>`
+  inside it and exits, with no web server. Mount WP-CLI's `.phar` and pass it
+  as the script, after `--` (without it, the CLI rejects the arguments as
+  unknown commands): `php --blueprint=... --mount-dir <dir> /tools --
+  /tools/wp-cli.phar --path=/wordpress plugin list`. Neither the official
+  `wp-playground` skill nor the CLI's README documents it.
+- **Plugin Check runs that way too.** A blueprint that only installs
+  `plugin-check`, plus the extracted release zip mounted, gave the same "No
+  errors found" as on Studio, in about 19 seconds. On the repo folder it
+  flagged the development files, so it was really checking.
+- **Why WP-CLI can't reach a plain `server` site:** with the usual options
+  the whole site lives in the memory of that process. It is not about
+  WebAssembly: when the site's files are on disk, another process can mount
+  them and run WP-CLI, even while the server is running. An `option update`
+  from WP-CLI showed on the running site straight away, in about 4 seconds.
+- **A site on disk must be mounted "before install".** `start` keeps its site
+  on disk by mounting it with `--mount-before-install` at `/wordpress` and
+  `--wordpress-install-mode=install-from-existing-files-if-needed` (read in
+  the CLI's code). With a plain `--mount-dir`, WP-CLI fails with "Error
+  connecting to the SQLite database". The first run on an empty folder needs
+  `download-and-install`; `install-from-existing-files-if-needed` fails there
+  with the same error.
+- **`start` keeps its sites in the home folder**
+  (`~/.wordpress-playground/sites/<hash>`). `server` with
+  `--mount-dir-before-install <folder> /wordpress` keeps a persistent site in
+  any folder, outside the repo.
+- **Constants from the blueprint don't reach WP-CLI** when they are defined
+  the default way: they live in Playground's `consts.json`, not in
+  `wp-config.php`, so the stored site had `WP_DEBUG` false.
+- **Homebrew's `wp` is the `.phar` itself**, with a `#!` line: it can be
+  mounted into Playground as is. `wp --info --format=json` gives the `.phar`
+  path (`wp_cli_phar_path`) on any platform.
+- **To check again: WP-CLI 2.12.0 on PHP 8.5 prints deprecation notices.**
+  Homebrew's `php` is 8.5 now. WP-CLI's bundled `react/promise` uses `case
+  ...;`, deprecated in PHP 8.5, and the notice goes to standard output,
+  before the command's own output. WP-CLI fixed it in its nightly builds in
+  March 2026 ([wp-cli/wp-cli#6271](https://github.com/wp-cli/wp-cli/issues/6271)),
+  but 2.12.0 (May 2025) is still the latest stable release, and a request
+  for a patch release ([#6435](https://github.com/wp-cli/wp-cli/issues/6435))
+  is open with no date. Even the nightly still prints notices from its
+  bundled gettext during `i18n make-pot`. Nothing breaks: scripts that read
+  WP-CLI's output skip the notices, and Playground runs PHP 8.3, where they
+  don't appear. Check for a new stable release; when it ships, update and
+  see whether the notices are gone.
+
 ## Intentionally Blank: the plugin workflow on a classic theme (November 2026)
 
 First run of the skill on a theme repo, on macOS. The skill's tooling and
