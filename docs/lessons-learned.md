@@ -81,21 +81,6 @@ small changes.
   changed string drops its translations in every language. In this theme the
   `style.css` headers (Theme Name, Description, Author, URIs) are translated
   strings too.
-- **When a tool is missing or fails, stop and ask.** Here `--studio-no-path`
-  failed and, instead of asking, the agent tried to download `wp-cli.phar`
-  (blocked by the permission system, by design) and then wrote its own
-  string-comparison script. The developer wants the environment fixed the
-  intended way (here, the Studio site), not improvised around.
-
-## WordPress.tv: a theme in another repository, linked into Studio (November 2026)
-
-The theme moved into a fork of the WordPress.org Meta repository, outside the
-Studio site, and the site's `wp-content/themes/wptv-27` became a symlink to it.
-
-- **Don't reorganize folders to work around a failure.** Moving the repository
-  into the site folder "fixed" it, but it wasn't the owner's layout and the
-  cause was the timing above. Stop at the first unexpected result, find the
-  cause, and let the owner decide.
 
 ## Camptix Badge Generator, now CampTix Badge Designer (October 2026)
 
@@ -128,13 +113,3 @@ theme that other agents are developing at the same time.
   `/wordpress/wp-content/themes/<slug>` in Playground, and drop the
   `activatePlugin` step from the blueprint. The Studio site was created by
   hand with those changes.
-
-## Classic Honeypot for CF7 (October 2026)
-
-The first project: a fork of a classic plugin, taken from development to
-WordPress.org submission on Windows 11.
-
-### Working on the plugin
-
-- **Ask for exactly what to remove.** When asked to tone down one thing in the
-  readme, Claude over-corrected and removed too much.

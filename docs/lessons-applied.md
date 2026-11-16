@@ -178,6 +178,12 @@ small changes.
   auto-login fails the same way in headless Chrome). Use the same URL that
   was passed to `--site-url`.
   → `testing.md` (One site, one address), `playground.md` (From another machine). Reproduced with curl: the login redirects to the `--site-url` address, where the cookies set for `127.0.0.1` are not sent.
+- **When a tool is missing or fails, stop and ask.** Here `--studio-no-path`
+  failed and, instead of asking, the agent tried to download `wp-cli.phar`
+  (blocked by the permission system, by design) and then wrote its own
+  string-comparison script. The developer wants the environment fixed the
+  intended way (here, the Studio site), not improvised around.
+  → `SKILL.md` (step 1), `environment.md` (When something is missing or fails)
 
 ## WordPress.tv: a theme in another repository, linked into Studio (November 2026)
 
@@ -208,6 +214,11 @@ Studio site, and the site's `wp-content/themes/wptv-27` became a symlink to it.
   site root, printing `get_option( 'stylesheet' )`, the theme's `realpath()`
   and `ini_get( 'open_basedir' )`, showed the real state in one request.
   → `studio.md` (Links and PHP's file access)
+- **Don't reorganize folders to work around a failure.** Moving the repository
+  into the site folder "fixed" it, but it wasn't the owner's layout and the
+  cause was the timing above. Stop at the first unexpected result, find the
+  cause, and let the owner decide.
+  → `SKILL.md` (step 1), `environment.md` (When something is missing or fails)
 
 ## Moving to macOS (November 2026)
 
@@ -812,6 +823,9 @@ releasing on GitHub and WordPress.org, with the developer away.
 - **Don't push unasked.** "Merge it so I can see the code" was read as
   "merge and push". It was not.
   *(Cute WP Badges (October 2026))*
+- **Ask for exactly what to remove.** When asked to tone down one thing in the
+  readme, Claude over-corrected and removed too much.
+  *(Classic Honeypot for CF7 (October 2026))*
 
 ### Setup of the developer's own computers.
 

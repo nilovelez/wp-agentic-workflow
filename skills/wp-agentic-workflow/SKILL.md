@@ -30,6 +30,7 @@ Run `node <skill>/scripts/check-env.mjs` from the repo root and read `references
 
 - If the folder name doesn't match the plugin slug, stop and give rename instructions.
 - If a tool is missing, say what is missing and what for, and ask whether the developer wants instructions or wants you to install it. When the developer has to do something, give the steps in your final message and wait.
+- If a tool fails or a step gives an unexpected result, stop, say what failed and ask. Don't work around it with other tools, scripts of your own or changes to the developer's folders.
 
 ### 2. Set up the repo (once)
 
