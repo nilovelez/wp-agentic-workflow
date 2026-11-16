@@ -22,6 +22,18 @@ These are WordPress standards, not preferences. Apply them to every change and p
 
 For how to write the plugin itself (structure, hooks, security, Settings API), follow the official `wp-plugin-development` skill.
 
+## Translated strings of a published plugin
+
+This applies to plugins and themes published on WordPress.org, as the project's `CLAUDE.md` says (see "Published or not" in `references/release.md`).
+
+- **What matters is what users get in their language.** Every translatable string of the last published version (on screen, in emails, in error messages, in the plugin header) already has translations in many languages, made by volunteers on translate.wordpress.org. If it changes, it shows untranslated in all of them until they translate it again.
+- **So the text of those strings is not changed without the developer's approval**, not even a typo, a comma or a capital letter. If a change is needed, propose it and explain the cost before making it.
+- **Replacing a string is changing it**, even if it is written as a new one. Leaving the old one commented out or in an unused variable keeps nothing: users see the new text untranslated, and the old one stays as clutter that translators keep maintaining. When a change is approved, remove the old string.
+- **Strings added since the last published version** are not translated yet: they can change freely until the next version is released.
+- **The text domain and the context of `_x()`** are part of the string: changing them breaks it too.
+
+In a plugin that is not published, strings change freely.
+
 ## Procedure
 
 ### 1. Check the environment
@@ -33,6 +45,8 @@ Run `node <skill>/scripts/check-env.mjs` from the repo root and read `references
 - If a tool fails or a step gives an unexpected result, stop, say what failed and ask. Don't work around it with other tools, scripts of your own or changes to the developer's folders.
 
 ### 2. Set up the repo (once)
+
+Find out whether the plugin is published on WordPress.org: for a new plugin it isn't; for an existing one, ask the developer, and for its URL if it is. A slug that exists on WordPress.org proves nothing, since it may belong to another plugin. Write it in the project's `CLAUDE.md` with the text in "Published or not" in `references/release.md`, so that every session knows whether to protect the translated strings. In a pull request to someone else's repo, ask but don't edit their `CLAUDE.md`.
 
 For a new plugin, settle the slug first: it is the folder, the text domain and the prefix, and renaming it later touches every file. Search for the name on WordPress.org, on GitHub and in the ecosystem the plugin is for (another plugin's repo, a platform's own code), not only in the plugin directory.
 

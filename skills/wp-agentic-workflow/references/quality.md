@@ -29,21 +29,6 @@ Fix the code, don't silence the rule. When a rule must be ignored, ignore that o
 
 For a block, name the sniff in both `phpcs:disable` and `phpcs:enable`. A bare `// phpcs:enable` turns every rule back on, including those disabled elsewhere in the file.
 
-## Translated strings
-
-Once the plugin is translated on translate.wordpress.org, every changed source string loses its translations in every language. Before each commit that touches strings, compare the POT of the last release with the working tree's:
-
-```bash
-git archive --format=tar --prefix=<slug>/ -o <temp>/<slug>-release.tar <last release tag>
-tar -xf <temp>/<slug>-release.tar -C <temp>
-wp i18n make-pot <temp>/<slug> <temp>/release.pot
-wp i18n make-pot . <temp>/current.pot --exclude=vendor,node_modules
-```
-
-`i18n make-pot` only reads files: the plain `wp`, with no site (see `environment.md`). `<temp>` is a folder outside the repo.
-
-Diff the sorted `msgid` lines of both files. Change a string only when the new wording is worth losing its translations, and say so in the commit.
-
 ## Plugin Check
 
 The official tool of the WordPress.org plugin review team. Run it on what reviewers will get, the release zip, not on the repo: on the repo folder (including the plugin linked into the Studio site) it also flags development files (`.git`, `.claude`, `.github`, `vendor/`, `CLAUDE.md`, extra Markdown files, untracked folders) that never reach the zip.

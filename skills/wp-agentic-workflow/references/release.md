@@ -23,7 +23,38 @@ Plugins hosted on WordPress.org are translated on translate.wordpress.org and ge
 wp i18n make-pot . <temp>/<slug>.pot --exclude=vendor,node_modules
 ```
 
-The POT is only for checking: the plugin doesn't ship it. Once the plugin has translations, compare the strings before each change (see "Translated strings" in `quality.md`).
+The POT is only for checking: the plugin doesn't ship it.
+
+## Published or not
+
+Whether the plugin is published on WordPress.org decides how its translated strings are treated (see "Translated strings of a published plugin" in `SKILL.md`). It can't be deduced: the slug may exist on WordPress.org for another plugin. Ask the developer, and write it in the project's `CLAUDE.md` in words that anyone understands, without knowing this skill.
+
+Not published:
+
+> This plugin is not published on WordPress.org yet: its strings can change freely. Check that they are translatable before each release.
+
+Published:
+
+> This plugin is published on WordPress.org: https://wordpress.org/plugins/<slug>/. This repository is where it is developed; each release is copied to WordPress.org's SVN.
+>
+> Its strings are translated by volunteers on translate.wordpress.org. Adding a string is fine, but changing or removing one from the last published version drops its translations in every language, so only do it when there is a good reason, with the developer's approval.
+
+For a theme, the same with "theme" and `https://wordpress.org/themes/<slug>/`. When the plugin is published, the README also says where: "This is the development repository of <Plugin Name>, published at https://wordpress.org/plugins/<slug>/."
+
+## Check the strings before a release
+
+For a published plugin, before each release, compare its strings with the last published version's, as a last check that none was changed or removed by mistake. The source is always the Git repository, never SVN: the tag of the last release or, in a pull request, the branch it goes to.
+
+```bash
+git archive --format=tar --prefix=<slug>/ -o <temp>/<slug>-release.tar <last release tag>
+tar -xf <temp>/<slug>-release.tar -C <temp>
+wp i18n make-pot <temp>/<slug> <temp>/release.pot
+wp i18n make-pot . <temp>/current.pot --exclude=vendor,node_modules
+```
+
+`<temp>` is a folder outside the repo. Compare the sorted `msgid` lines of both files: `msgid` lines only in `release.pot` are strings that lose their translations. Each one needs the developer's approval (see `SKILL.md`). Strings only in `current.pot` are new, which is fine.
+
+For a plugin that is not published, check that the strings are translatable before each release.
 
 ## Build the zip
 
@@ -50,7 +81,7 @@ Check its contents (`unzip -l` or open it) before submitting: no development fil
 
 The automated scan runs first; then the plugin waits in the manual review queue (it can take weeks). If the reviewers ask for changes, **reply to their email**; never submit the plugin again.
 
-Several emails can arrive close together: an AI-assisted pre-review ("Let's improve your plugin") and the approval ("Your review has been successfully completed"). Read them all, in order, before acting. Once approved, the slug is final and no reply is needed. Still go through each pre-review finding: fix the real ones in the next version (they will come up again in later reviews) and leave the rest.
+Several emails can arrive close together: an AI-assisted pre-review ("Let's improve your plugin") and the approval ("Your review has been successfully completed"). Read them all, in order, before acting. Once approved, the slug is final and no reply is needed. From then on the plugin is published: change its text in the project's `CLAUDE.md` and add the sentence to the README (see "Published or not"). Still go through each pre-review finding: fix the real ones in the next version (they will come up again in later reviews) and leave the rest.
 
 ## Upload to SVN
 
