@@ -8,7 +8,7 @@ Studio is recommended, not required. Playground covers everything else, persiste
 
 Clone the repo into its final folder first: the site links to that path (see "Moving the repo" below).
 
-From the plugin repo root:
+From the plugin or theme repo root:
 
 ```bash
 node <skill>/scripts/studio-site.mjs
@@ -16,11 +16,11 @@ node <skill>/scripts/studio-site.mjs
 
 It does, in order:
 
-1. `studio create` in `~/Studio/<slug>` (`--sites-dir` to change it), PHP 8.3 (`--php`), domain `<slug>.local`, login `admin` / `password`, `--file-access all-files` (the plugin is a link to a folder outside the site), not started. If the repo has a `blueprint.json`, Studio applies it during creation.
-2. Links the repo into `wp-content/plugins/<slug>`: a junction on Windows (no admin rights needed), a symbolic link elsewhere.
-3. Activates the plugin with `studio wp plugin activate`.
+1. `studio create` in `~/Studio/<slug>` (`--sites-dir` to change it), PHP 8.3 (`--php`), domain `<slug>.local`, login `admin` / `password`, `--file-access all-files` (the plugin is a link to a folder outside the site), not started. Studio applies the repo's `blueprint.json` during creation (or the file given with `--blueprint`, for a repo that isn't yours to add one to). A blueprint is required: without one, Studio creates the site without installing WordPress (there is no `wp-config.php`), and nothing can be activated.
+2. Links the repo into `wp-content/plugins/<slug>` (a theme: `wp-content/themes/<slug>`): a junction on Windows (no admin rights needed), a symbolic link elsewhere.
+3. Activates it with `studio wp plugin activate` (or `theme activate`).
 
-The blueprint's `activatePlugin` step for the plugin itself does nothing during creation, because the link doesn't exist yet: Studio skips it without an error. That is why the script activates the plugin afterwards, and why test-content steps in the blueprint must not depend on the plugin being active.
+The blueprint's `activatePlugin` step for the plugin itself does nothing during creation, because the link doesn't exist yet: Studio skips it without an error. That is why the script activates the plugin afterwards, and why test-content steps in the blueprint must not depend on the plugin being active. A theme's `activateTheme` step does leave it as the active theme, but its code isn't there while the blueprint runs either.
 
 ## Start it
 
@@ -58,7 +58,7 @@ Studio's proxy (ports 80 and 443) listens on all interfaces, so another computer
 
 ## Moving the repo
 
-The plugin folder in the site is a link to the repo's path. If the repo is moved or renamed, the link still points to the old path, now empty, and nothing warns about it. Recreate the link:
+The plugin (or theme) folder in the site is a link to the repo's path. If the repo is moved or renamed, the link still points to the old path, now empty, and nothing warns about it. Recreate the link:
 
 - Windows (PowerShell): `(Get-Item <site>\wp-content\plugins\<slug>).Delete()`, then `New-Item -ItemType Junction -Path <site>\wp-content\plugins\<slug> -Target <new repo path>`.
 - macOS/Linux: `rm <site>/wp-content/plugins/<slug>`, then `ln -s <new repo path> <site>/wp-content/plugins/<slug>`.
@@ -67,7 +67,7 @@ Claude Code's per-project memory is also keyed by the repo path: move it too (`~
 
 ## Delete it
 
-**Remove the plugin link first**, then delete the site. `studio delete` moves the site's files to the trash, and the link points to the repo.
+**Remove the plugin (or theme) link first**, then delete the site. `studio delete` moves the site's files to the trash, and the link points to the repo.
 
 - Windows (PowerShell): `(Get-Item <site>\wp-content\plugins\<slug>).Delete()` removes only the junction.
 - macOS/Linux: `rm <site>/wp-content/plugins/<slug>` (no trailing slash, no `-r`).

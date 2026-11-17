@@ -4,7 +4,7 @@ Run this before anything else in a session, and again after installing a missing
 
 ## Check
 
-From the plugin repo root:
+From the plugin or theme repo root:
 
 ```bash
 node <skill>/scripts/check-env.mjs
@@ -24,7 +24,7 @@ It checks:
 | Studio app and Studio CLI (`studio`) | A persistent test site that stays running with a fixed domain (`studio.md`) | Recommended (not available on Linux) |
 | Subversion (`svn`) | Publishing on WordPress.org | No |
 | Chrome | WordPress.org screenshots and banners, headless browser tests | No |
-| Plugin folder | Folder name = plugin slug (Text Domain) | Yes |
+| Plugin or theme folder | Folder name = slug (Text Domain) | Yes |
 
 For PHP, also run `php <skill>/scripts/check-php.php`: it checks the version, `php.ini`, the extensions Composer and PHPCS need, and prints the `php.ini` lines to fix.
 
@@ -64,7 +64,7 @@ After installing, a new terminal is needed to pick up the new PATH. Tools starte
 
 ## Folder name = slug
 
-The repo folder must be named exactly like the plugin slug (the Text Domain, usually also the main file name). Mounting or linking a folder under another name needs fragile paths, especially on Windows. If it doesn't match, stop and give rename instructions: close the editor and Claude Code, rename the folder, open it again. Renaming the remote repo to match is recommended, not required.
+The repo folder must be named exactly like the slug: the Text Domain, for a plugin usually also the main file name, for a theme the one in `style.css`. Mounting or linking a folder under another name needs fragile paths, especially on Windows. If it doesn't match, stop and give rename instructions: close the editor and Claude Code, rename the folder, open it again. Renaming the remote repo to match is recommended, not required.
 
 ## Windows shells
 

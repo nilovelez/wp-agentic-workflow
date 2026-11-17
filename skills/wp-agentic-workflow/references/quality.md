@@ -1,6 +1,6 @@
-# Code quality: WPCS and Plugin Check
+# Code quality: WPCS, Plugin Check and Theme Check
 
-Both must be clean before any release. They are not optional and not a matter of taste: they are how WordPress code is written and reviewed.
+WPCS and Plugin Check (Theme Check for a theme) must be clean before any release. They are not optional and not a matter of taste: they are how WordPress code is written and reviewed.
 
 ## WordPress Coding Standards (PHPCS)
 
@@ -50,3 +50,19 @@ On a Studio site, the same check is `studio wp --path <site> plugin check <extra
 With WPCS clean, Plugin Check usually finds little. A common one: `load_plugin_textdomain()` is not needed for a plugin hosted on WordPress.org (see "Translations" in `release.md`).
 
 For the plugin's code itself (security, Settings API, lifecycle), see the official `wp-plugin-development` skill. For the directory rules (licensing, naming, trialware), `wp-plugin-directory-guidelines`.
+
+## Theme Check
+
+For a theme, the equivalent of Plugin Check is Theme Check, the tool of the WordPress.org theme review team. The same way, on the release zip:
+
+```bash
+node <skill>/scripts/playground-wp.mjs --theme-check
+```
+
+It runs `wp theme-check run <slug>` with the extracted release mounted as an installed theme (Theme Check takes a theme slug, not a path). Extra arguments go after `--` (for example `-- --format=json`). Its findings come in three levels:
+
+- **REQUIRED**: fix them before submitting; the theme is not accepted with them. The script exits with 1 when there is any.
+- **RECOMMENDED**: review them one by one. Many depend on what the theme does (comments, menus, widget areas), and a theme that doesn't need a feature can leave it out.
+- **INFO**: notes for the review, such as the extra accessibility review for the `accessibility-ready` tag.
+
+A complete theme like Twenty Twenty-Five comes out with INFO items only. A very small theme can get many REQUIRED and RECOMMENDED items: that is what the check is for.

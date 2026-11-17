@@ -60,6 +60,7 @@ Say: "The test site is at `http://<address>:9400/` (admin / password)." Test it 
 
 **A site only for your own tests**, started for a check and stopped afterwards: the same command without `--site-url`. Its address is `http://127.0.0.1:9400` (or the port you pass), and it is a secure context (see below).
 
+- A theme is mounted at `/wordpress/wp-content/themes/<slug>`, here and in the commands below; to stop it, match `themes/<slug>` instead of `plugins/<slug>`.
 - `--mount-dir <host> <vfs>` instead of `--mount <host>:<vfs>`: on Windows `--mount` rejects drive-letter paths, and `--mount-dir` works everywhere (relative paths too).
 - In Git Bash on Windows, prefix the command with `MSYS_NO_PATHCONV=1` (see `environment.md`).
 - Login: `admin` / `password`.

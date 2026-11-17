@@ -1,5 +1,7 @@
 # Release and WordPress.org
 
+This covers plugins. For a theme, the zip, `.gitattributes` and the translated strings work the same way; its submission and review on WordPress.org are different and not covered yet.
+
 ## The repo holds the plugin and its development files
 
 The repo holds only the plugin plus its configuration and development files. Development files are kept out of the release zip with `export-ignore` in `.gitattributes` (start from `templates/gitattributes` and add any other development file or folder).

@@ -1,7 +1,7 @@
 ---
 name: wp-agentic-workflow
-description: "Use for any work on a WordPress plugin repository, however small: starting or continuing development (\"we're working on a WordPress plugin\"), a one-line fix, addressing a WordPress.org review, or preparing a new version. Load it before changing plugin code. It checks and installs the development tools, sets up test sites and runs WP-CLI on them (Playground, and Studio for a site that stays running), enforces WordPress coding standards (WPCS, Plugin Check), and takes the plugin to a WordPress.org release (zip, assets, submission). Opinionated glue on top of the official WordPress agent skills."
-compatibility: "WordPress plugins (themes not covered yet). Node.js 20.18+, PHP 7.4+, Composer and WP-CLI; WordPress Studio recommended. Validated on Windows 11 and macOS; Linux untested."
+description: "Use for any work on a WordPress plugin or theme repository, however small: starting or continuing development (\"we're working on a WordPress plugin\", \"on a theme\"), a one-line fix, addressing a WordPress.org review, or preparing a new version. Load it before changing plugin or theme code. It checks and installs the development tools, sets up test sites and runs WP-CLI on them (Playground, and Studio for a site that stays running), enforces WordPress coding standards (WPCS, Plugin Check, Theme Check), and takes a plugin to a WordPress.org release (zip, assets, submission). Opinionated glue on top of the official WordPress agent skills."
+compatibility: "WordPress plugins and themes (theme releases on WordPress.org not covered yet). Node.js 20.18+, PHP 7.4+, Composer and WP-CLI; WordPress Studio recommended. Validated on Windows 11 and macOS; Linux untested."
 ---
 
 # WordPress plugin workflow
@@ -9,6 +9,16 @@ compatibility: "WordPress plugins (themes not covered yet). Node.js 20.18+, PHP 
 One way of developing a WordPress plugin, the same on every project, from the first line of code to WordPress.org. It follows what WordPress officially recommends at the moment (Playground, Blueprints, Studio, WP-CLI, the WordPress Coding Standards, Plugin Check) and builds on the official skills from [WordPress/agent-skills](https://github.com/WordPress/agent-skills); this skill only adds the glue between them and a few opinions. Don't set up or suggest wp-env: it needs Docker, and Playground and Studio cover the same without it. If a project already uses wp-env (its own scripts, its test suite), that is the project's choice: use it as it is.
 
 `<skill>` below is the folder of this skill.
+
+## Themes
+
+Everything in this skill applies to themes too: where it says "plugin", read "plugin or theme" unless a section says otherwise. The scripts recognize a theme by the `Theme Name:` header of its `style.css`, and a plugin by the `Plugin Name:` header of a root PHP file. The differences:
+
+- A theme is mounted or linked into `wp-content/themes/<slug>`, not `plugins/`. The scripts do it.
+- Its blueprint template is `templates/blueprint-theme.json`: it activates the theme and opens the front page.
+- Its release check is Theme Check (`playground-wp.mjs --theme-check`), not Plugin Check (`references/quality.md`).
+- `screenshot.png` is part of the theme: it goes in the zip.
+- For how to write the theme itself (`theme.json`, templates, patterns), follow the official `wp-block-themes` skill.
 
 ## WordPress standards
 
@@ -61,7 +71,7 @@ For a new plugin, settle the slug first: it is the folder, the text domain and t
 
 If they don't exist yet, add from `templates/`:
 
-- `blueprint.json`: the test site's dependencies and content (`references/playground.md`).
+- `blueprint.json`: the test site's dependencies and content (`references/playground.md`). For a theme, from `blueprint-theme.json`.
 - `composer.json` and `phpcs.xml.dist`: WPCS (`references/quality.md`).
 - `.gitattributes` and `.gitignore`: development files out of the zip (`references/release.md`).
 
@@ -85,7 +95,7 @@ Test changes on a running site before handing them over, with HTTP requests or a
 
 ### 5. Quality
 
-Before every commit that touches PHP: `composer lint`. Before any release: Plugin Check on the extracted release zip (`node <skill>/scripts/playground-wp.mjs --plugin-check`). Details in `references/quality.md`.
+Before every commit that touches PHP: `composer lint`. Before any release: Plugin Check on the extracted release zip (`node <skill>/scripts/playground-wp.mjs --plugin-check`), or Theme Check for a theme (`--theme-check`). Details in `references/quality.md`.
 
 ### 6. Release
 
@@ -98,12 +108,13 @@ Install them with `npx skills add WordPress/agent-skills -g -a claude-code`. Rea
 - `wp-playground` and `blueprint`: Playground CLI and Blueprint syntax.
 - `studio-cli`: Studio sites and `studio wp`.
 - `wp-plugin-development`: plugin code.
+- `wp-block-themes`: theme code (`theme.json`, templates, patterns).
 - `wp-wpcli-and-ops`: WP-CLI.
 - `wp-plugin-directory-guidelines`: WordPress.org rules.
 - `wp-abilities-api`: abilities for the MCP Adapter.
 
 ## Not covered yet
 
-- Themes: only plugins have been tested.
+- Theme releases on WordPress.org: themes are submitted and reviewed differently from plugins, and that hasn't been tried with this skill yet. `references/release.md` covers plugins only.
 - Linux: the commands follow each tool's documentation but have only been tested on Windows 11 and macOS. Studio is not available on Linux; Playground covers every test site there.
 - `scripts/playground-wp.mjs` was written on macOS and is not yet tested on Windows.
