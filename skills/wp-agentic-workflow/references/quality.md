@@ -14,6 +14,8 @@ Set up once per repo, with Composer as a development dependency:
 
 A repo that predates this setup has no WPCS yet: set it up as above. A missing tool means "set it up", never "skip the check".
 
+If the repo already has a PHPCS ruleset, merge the template into it instead of replacing it: it carries the project's own values. A ruleset written for WPCS 2 stops WPCS 3 with an error such as `Property "minimum_supported_wp_version" does not exist`, and nothing is checked. Offer the developer to update it, following the [upgrade guide for ruleset maintainers](https://github.com/WordPress/WordPress-Coding-Standards/wiki/Upgrade-Guide-to-WordPressCS-3.0.0-for-ruleset-maintainers) and keeping its text domain, prefixes and minimum versions. Name it `phpcs.xml.dist`: that is the committed ruleset, and PHPCS reads a `phpcs.xml` before it, as each developer's local override.
+
 Run it:
 
 ```bash

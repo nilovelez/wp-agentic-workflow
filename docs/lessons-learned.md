@@ -47,11 +47,6 @@ small changes.
   sense as `/` than `/wp-admin/plugins.php`. Worked first time on macOS.
 - **`.gitattributes` for a theme:** don't export-ignore `screenshot.png`
   (the theme needs it); `/.github` and `/guppy` go out of the zip too.
-- **An old `phpcs.xml` was the WPCS sample ruleset.** It used
-  `minimum_supported_wp_version`, which WPCS 3 renamed to
-  `minimum_wp_version`, and no `composer.json` installed WPCS at all. Moved
-  it to `phpcs.xml.dist` (as the template expects), kept its text domain,
-  prefix, minimum WordPress (4.6) and PHP (7.4) values.
 - **Plugin Check doesn't apply.** The theme equivalent is the Theme Check
   plugin (`theme-check`); the skill doesn't cover it yet. (This particular
   theme is flagged as a special case in the WordPress.org theme directory and

@@ -78,6 +78,14 @@ small changes.
   8.3, WordPress latest) ran PHP 8.3, silently. Checked with the
   `X-Powered-By` header. To test the minimum and latest versions, write
   throwaway copies of the blueprint with other `preferredVersions` in scratch.
+- **An old `phpcs.xml` was the WPCS sample ruleset.** It used
+  `minimum_supported_wp_version`, which WPCS 3 renamed to
+  `minimum_wp_version`, and no `composer.json` installed WPCS at all. Moved
+  it to `phpcs.xml.dist` (as the template expects), kept its text domain,
+  prefix, minimum WordPress (4.6) and PHP (7.4) values.
+  → `quality.md` (offer to update an old ruleset). Reproduced with WPCS
+  3.4.1: the old property stops PHPCS with `Property
+  "minimum_supported_wp_version" does not exist`, and nothing is checked.
   → `playground.md` (blueprint rules)
 - **WordPress 6.1 on PHP 8.2 fills the debug log with core deprecations**
   (`Requests`, `formatting.php`, `pluggable.php`). Filter the log by the
