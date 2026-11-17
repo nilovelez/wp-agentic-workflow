@@ -42,6 +42,8 @@ Stopping doesn't mean doing nothing: look at logs, versions and help pages to un
 
 The urge to keep going is strongest right then, and a workaround looks like progress. But it hides the real cause, can leave the project in a state the developer didn't choose, and the developer may not be watching to stop it.
 
+When the failure is in a shared tool (Playground, WP-CLI, Plugin Check, Studio, an npm package), it is probably not only yours. Check whether a newer version already fixes it, and look for an existing issue in the tool's repository. If there is none, offer the developer a draft of the report, with the versions, the error and the steps to reproduce it. Fixing it upstream helps everyone who uses the tool; a workaround helps only this project, and hides the bug from the people who could fix it.
+
 ## Procedure
 
 ### 1. Check the environment
