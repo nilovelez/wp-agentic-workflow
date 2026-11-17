@@ -4,13 +4,16 @@
  * current folder, with the plugin or theme linked from the repo (not copied).
  *
  * Usage, from the plugin or theme repo root:
- *   node <skill>/scripts/studio-site.mjs [--sites-dir <dir>] [--php <version>]
+ *   node <skill>/scripts/studio-site.mjs [--sites-dir <dir>] [--php <version>] [--blueprint <file>]
  *
  * - Site folder: <sites-dir>/<slug> (default sites dir: ~/Studio).
  * - Domain: <slug>.local. Login: admin / password, the same as Playground.
- * - If the repo has a blueprint.json, Studio applies it when creating the
- *   site. Its step that activates this plugin or theme does nothing at that
- *   point (it is linked afterwards), so it is activated here.
+ * - Blueprint: the repo's blueprint.json, or the file given with
+ *   --blueprint (for a repo that isn't yours to add one to). One of them is
+ *   needed: without a blueprint, `studio create --no-start` doesn't install
+ *   WordPress (there is no wp-config.php), and nothing can be activated.
+ * - The blueprint runs before the plugin or theme is linked, so its step
+ *   that activates it can't do the job: it is activated here.
  *
  * The site is created but not started: starting it adds the domain to the
  * hosts file, which asks for confirmation (UAC on Windows). Start it with:
@@ -63,12 +66,21 @@ if ( project.error ) {
 // Where WordPress looks for it: wp-content/plugins/ or wp-content/themes/.
 const contentFolder = 'theme' === project.type ? 'themes' : 'plugins';
 const name = project.name;
+
+const blueprint = path.resolve( getOption( '--blueprint', path.join( repo, 'blueprint.json' ) ) );
+if ( ! existsSync( blueprint ) ) {
+	console.error( `No blueprint: ${ blueprint } doesn't exist.
+Studio needs one to install WordPress when it creates a site without starting it.
+Add a blueprint.json to the repo (see references/playground.md), or, in a repo
+that isn't yours to change, pass one kept outside it with --blueprint <file>.` );
+	process.exit( 1 );
+}
 if ( existsSync( site ) ) {
 	console.error( `${ site } already exists. Use that site, or delete it first (studio delete --path "${ site }").` );
 	process.exit( 1 );
 }
 
-// 1. Create the site, applying the repo's blueprint if there is one.
+// 1. Create the site, applying the blueprint.
 //    --file-access all-files: the plugin or theme is a link to a folder outside the site.
 //    --admin-password: otherwise Studio generates a random one.
 const createArgs = [
@@ -82,11 +94,8 @@ const createArgs = [
 	'--no-start',
 	'--skip-browser',
 	'--skip-log-details',
+	'--blueprint', blueprint,
 ];
-const blueprint = path.join( repo, 'blueprint.json' );
-if ( existsSync( blueprint ) ) {
-	createArgs.push( '--blueprint', blueprint );
-}
 studio( createArgs );
 
 // 2. Link the plugin or theme from the repo. On Windows a junction, which needs no
