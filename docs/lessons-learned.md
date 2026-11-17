@@ -9,6 +9,23 @@ When a lesson is reviewed, it moves to `lessons-applied.md`: to its main
 part once it is in the skill, or to "Reviewed, not in the skill" with the
 reason.
 
+## Themes in the skill (November 2026)
+
+- **To check: Plugin Check 2.2.0 prints a PHP deprecation notice.** Running
+  `playground-wp.mjs --plugin-check` on Classic Honeypot for CF7 printed
+  `Deprecated: trim(): Passing null to parameter #1 ($string) of type string
+  is deprecated` from its bundled PHP_CodeSniffer
+  (`vendor/squizlabs/php_codesniffer/src/Util/Common.php`, line 220), on
+  Playground's PHP 8.3, before "No errors found". Nothing breaks. Check whether it is already
+  reported or fixed upstream, and report it if not.
+- **`studio create --no-start` without a blueprint doesn't install
+  WordPress.** With Studio CLI 2.2.0 the site folder had no `wp-config.php`,
+  so `studio wp ... activate` failed with "'wp-config.php' not found". With
+  any blueprint, the site was installed. `studio-site.mjs` now requires one,
+  from the repo or with `--blueprint`. Also, the blueprint's `activateTheme`
+  step runs before the theme is linked but still leaves it as the active
+  theme: the later `theme activate` only warns that it is already active.
+
 ## WP-CLI on Playground instead of Studio (November 2026)
 
 `studio wp --studio-no-path` stopped working in Studio CLI 2.x, which left

@@ -7,10 +7,12 @@
 *.gif binary
 
 # Development files, excluded from `git archive` (the release zip).
-# Add here any other file or folder that is not part of the plugin.
+# Add here any other file or folder that is not part of the plugin or theme.
+# In a theme, screenshot.png is part of the theme: don't exclude it.
 /.gitattributes  export-ignore
 /.gitignore      export-ignore
 /.claude         export-ignore
+/.github         export-ignore
 /CLAUDE.md       export-ignore
 /README.md       export-ignore
 /blueprint.json  export-ignore
