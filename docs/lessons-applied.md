@@ -8,6 +8,17 @@ WordPress development with Claude. Newest project first.
 Lessons that were reviewed and left out of the skill are at the end, with
 the reason.
 
+## Themes in the skill (November 2026)
+
+- **`studio create --no-start` without a blueprint doesn't install
+  WordPress.** With Studio CLI 2.2.0 the site folder had no `wp-config.php`,
+  so `studio wp ... activate` failed with "'wp-config.php' not found". With
+  any blueprint, the site was installed. `studio-site.mjs` now requires one,
+  from the repo or with `--blueprint`. Also, the blueprint's `activateTheme`
+  step runs before the theme is linked but still leaves it as the active
+  theme: the later `theme activate` only warns that it is already active.
+  → `studio-site.mjs` (requires a blueprint, `--blueprint`), `studio.md`
+
 ## WP-CLI on Playground instead of Studio (November 2026)
 
 `studio wp --studio-no-path` stopped working in Studio CLI 2.x, which left
@@ -192,6 +203,53 @@ small changes.
   string-comparison script. The developer wants the environment fixed the
   intended way (here, the Studio site), not improvised around.
   → `SKILL.md` (step 1), `environment.md` (When something is missing or fails)
+- **`check-env.mjs` fails on a theme.** It looks for a PHP file with a
+  `Plugin Name:` header and reports NOT READY. Every tool was fine; the only
+  failure was the missing plugin header. A theme check would look for
+  `style.css` with a `Theme Name:` header (and folder = Text Domain).
+  → `scripts/project.mjs`: the scripts recognize a theme by `style.css` (check-env, playground-wp, studio-site)
+- **Blueprint for a theme:** mount the repo at
+  `/wordpress/wp-content/themes/<slug>` and use `activateTheme` with
+  `themeFolderName` instead of `activatePlugin`. The landing page makes more
+  sense as `/` than `/wp-admin/plugins.php`. Worked first time on macOS.
+  → `templates/blueprint-theme.json`, `SKILL.md` (Themes)
+- **`.gitattributes` for a theme:** don't export-ignore `screenshot.png`
+  (the theme needs it); `/.github` and `/guppy` go out of the zip too.
+  → `templates/gitattributes` (`screenshot.png` note, `/.github`). `/guppy` is the developer's own and stays out of the template.
+- **Plugin Check doesn't apply.** The theme equivalent is the Theme Check
+  plugin (`theme-check`); the skill doesn't cover it yet. (This particular
+  theme is flagged as a special case in the WordPress.org theme directory and
+  skips Theme Check, but any other theme would need it.)
+  → `quality.md` (Theme Check), `playground-wp.mjs --theme-check`. Validated in November 2026: 7 REQUIRED items on Intentionally Blank, only INFO on Twenty Twenty-Five.
+- **Studio site for a theme: the same steps as `studio-site.mjs`, with
+  `themes/` instead of `plugins/`.** The script stops on a theme (it needs a
+  `Plugin Name:` header), so the steps were run by hand on macOS with Studio
+  CLI 2.2.0, and they worked:
+  1. `studio create --path ~/Studio/<slug> --name "<Theme Name>" --php 8.3
+     --file-access all-files --domain <slug>.local --admin-password password
+     --no-start --skip-browser --skip-log-details --blueprint ./blueprint.json`
+     from the repo root. The blueprint's `activateTheme` step does nothing
+     during creation (the theme isn't linked yet) and Studio skips it without
+     an error: the site ends up on the default theme (`twentytwentyfive`),
+     just as `activatePlugin` is skipped for a plugin.
+  2. `ln -s <repo path> ~/Studio/<slug>/wp-content/themes/<slug>`.
+  3. `studio wp --path ~/Studio/<slug> theme activate <slug>`, then check with
+     `studio wp --path ~/Studio/<slug> option get stylesheet`.
+  For the script: detect a theme by `style.css` with a `Theme Name:` header
+  at the repo root, take the name from it, link into `wp-content/themes/` and
+  run `theme activate` instead of `plugin activate`. Deleting the site needs
+  the same care as for a plugin: remove the link under `themes/` first.
+  `theme list` shows "version higher than expected" while the repo's version
+  isn't deployed on WordPress.org yet; that is expected.
+  → `studio-site.mjs`, `studio.md`. Correction, with Studio CLI 2.2.0: the blueprint's `activateTheme` step does leave the theme active; the later `theme activate` only warns.
+- **Guard the translated strings with WP-CLI.** For a theme or plugin
+  already translated on translate.wordpress.org, generate a POT of the last
+  release (`git archive <tag>` into scratch, then `i18n make-pot`) and of the
+  working tree, and diff their sorted `msgid` lines before each commit. Any
+  changed string drops its translations in every language. In this theme the
+  `style.css` headers (Theme Name, Description, Author, URIs) are translated
+  strings too.
+  → `SKILL.md` (Translated strings of a published plugin), `release.md` (Check the strings before a release): a working rule while editing, and the POT comparison once per release rather than before each commit. `wp i18n make-pot` includes a theme's `style.css` headers.
 
 ## WordPress.tv: a theme in another repository, linked into Studio (November 2026)
 
@@ -266,6 +324,21 @@ It was the first time the skill ran on macOS.
   confirmed the working copy before any commit. The cached WordPress.org
   credentials stay on the old computer.
   → `release.md` (Upload to SVN)
+
+## WordPress.tv 27 (October 2026)
+
+An external review (coding standards, security, feature parity) of a block
+theme that other agents are developing at the same time.
+
+- **The scripts assume a plugin.** `check-env.mjs` fails its last check
+  because it looks for a root file with a `Plugin Name:` header, and
+  `studio-site.mjs` stops for the same reason. Everything else applies to a
+  theme with small changes: link the repo into `wp-content/themes/<slug>`
+  instead of `plugins/`, activate it with `theme activate`, mount it under
+  `/wordpress/wp-content/themes/<slug>` in Playground, and drop the
+  `activatePlugin` step from the blueprint. The Studio site was created by
+  hand with those changes.
+  → `scripts/project.mjs`, `playground-wp.mjs`, `studio-site.mjs`, `playground.md`, `studio.md`
 
 ## Camptix Badge Generator, now CampTix Badge Designer (October 2026)
 
