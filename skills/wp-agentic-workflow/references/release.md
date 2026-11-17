@@ -27,6 +27,8 @@ Plugins hosted on WordPress.org are translated on translate.wordpress.org and ge
 wp i18n make-pot . <temp>/<slug>.pot --exclude=vendor,node_modules
 ```
 
+For a theme, the same applies to `load_theme_textdomain()`, and its language packs are at `https://api.wordpress.org/translations/themes/1.0/?slug=<slug>`.
+
 The POT is only for checking: the plugin doesn't ship it.
 
 ## Published or not

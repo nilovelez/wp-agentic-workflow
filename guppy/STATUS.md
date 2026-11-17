@@ -10,10 +10,15 @@ Written on macOS and not yet tested on Windows (there is no Windows machine at h
 - `scripts/check-env.mjs`: the Studio app locations (`%LOCALAPPDATA%\studio\Studio.exe`, `%LOCALAPPDATA%\Programs\Studio\Studio.exe`), and reading the `.phar` path from `wp --info` with a `wp.bat` wrapper.
 - `references/environment.md`: the WP-CLI install on Windows (`wp-cli.phar` plus a `wp.bat`).
 
+## Pending tests with themes
+
+- A child theme: it needs its parent theme installed, and neither the Playground mount, Studio nor Theme Check (`playground-wp.mjs --theme-check`) installs it. Untested; try it when a real child theme comes up, and write down what fails.
+
 ## Log
 
 Newest entries first. One per work session, brief.
 
+- 2026-11-18: skill reviewed again. Theme notes added where the text still read as plugin-only (theme translations API and `load_theme_textdomain()`, Theme Check in the standards, themes validated only on macOS). Child themes noted as a pending test.
 - 2026-11-17: a theme's `assets/` goes in its zip: the template's `assets` lines are marked as plugin-only (`templates/gitattributes`, `release.md`, `SKILL.md`). Lesson from Intentionally Blank, checked against the default themes.
 - 2026-11-17: themes milestone. Shared plugin/theme detection, themes in `playground-wp.mjs` (with `--theme-check`, validated: 7 REQUIRED on Intentionally Blank, INFO only on Twenty Twenty-Five) and `studio-site.mjs` (blueprint now required, or `--blueprint`), `templates/blueprint-theme.json`, `/.github` out of the zip, a "Themes" section in `SKILL.md`. Theme lessons moved to the applied record.
 - 2026-11-17: "When something fails" now says to report failures in shared tools upstream. Last loose lessons reviewed, each reproduced first: `quality.md` offers to update a WPCS 2 ruleset (it stops WPCS 3 with an error); `playground.md` lists PHP warnings on the page as a sign of #4615 (7 of 12 starts with the old CampTix blueprint, 0 of 6 with `rewrite-wp-config`); WP-CLI 2.12.0 is still the latest release.

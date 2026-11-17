@@ -1,7 +1,7 @@
 ---
 name: wp-agentic-workflow
 description: "Use for any work on a WordPress plugin or theme repository, however small: starting or continuing development (\"we're working on a WordPress plugin\", \"on a theme\"), a one-line fix, addressing a WordPress.org review, or preparing a new version. Load it before changing plugin or theme code. It checks and installs the development tools, sets up test sites and runs WP-CLI on them (Playground, and Studio for a site that stays running), enforces WordPress coding standards (WPCS, Plugin Check, Theme Check), and takes a plugin to a WordPress.org release (zip, assets, submission). Opinionated glue on top of the official WordPress agent skills."
-compatibility: "WordPress plugins and themes (theme releases on WordPress.org not covered yet). Node.js 20.18+, PHP 7.4+, Composer and WP-CLI; WordPress Studio recommended. Validated on Windows 11 and macOS; Linux untested."
+compatibility: "WordPress plugins and themes (theme releases on WordPress.org not covered yet). Node.js 20.18+, PHP 7.4+, Composer and WP-CLI; WordPress Studio recommended. Validated on Windows 11 and macOS (themes only on macOS); Linux untested."
 ---
 
 # WordPress plugin workflow
@@ -27,7 +27,7 @@ These are WordPress standards, not preferences. Apply them to every change and p
 - **US English** (en_US, the source locale of WordPress) for code, comments, user-facing strings, the readme and commit messages, whatever language you talk to the developer in.
 - **Translatable from the first line**, in PHP and in JavaScript (`@wordpress/i18n`, `wp_set_script_translations()`). Retrofitting i18n later means going through every component.
 - **Readable, simple code.** A plain loop or `if` over clever closures and one-liners. Don't try to be smart.
-- **WordPress Coding Standards** (PHPCS with WPCS) clean, and **Plugin Check** clean before any release.
+- **WordPress Coding Standards** (PHPCS with WPCS) clean, and **Plugin Check** (Theme Check for a theme) clean before any release.
 - **The repo holds the plugin** plus its configuration and development files; development files stay out of the release zip.
 
 For how to write the plugin itself (structure, hooks, security, Settings API), follow the official `wp-plugin-development` skill.
