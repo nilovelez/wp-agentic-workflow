@@ -352,6 +352,17 @@ A plugin that turns CampTix CSV exports into printable PDF badges.
   their own username after they confirm. Reading it (with `gh api`) took a
   minute and changed the decision.
   → `testing.md` (Check assumptions at the source)
+- **Read Playground's PHP log from the host.** The site's files live inside
+  Playground, so `WP_DEBUG_LOG` was pointed at a path inside the mounted
+  plugin folder (`sandbox/debug.log`, ignored by Git). Warnings also reached
+  the page even with `WP_DEBUG_DISPLAY` off, and broke a CSV download.
+  → `playground.md` (the `rewrite-wp-config` rule). Reproduced in November
+  2026 with this plugin's blueprint (`login`, then `defineWpConfigConsts`
+  with the default method): in 7 of 12 starts the constants were lost
+  (WordPress/wordpress-playground#4615), `WP_DEBUG` ended up `false`,
+  Playground left `display_errors` on and the warning showed on the page.
+  With `rewrite-wp-config`, 6 of 6 starts were clean. Reading the log is
+  covered in `testing.md` (Read the debug log).
 
 ## Cute WP Badges (October 2026)
 

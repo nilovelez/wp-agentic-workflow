@@ -24,7 +24,9 @@ Playground CLI 3.1.65, WP-CLI 2.12.0 and Classic Honeypot for CF7.
   but 2.12.0 (May 2025) is still the latest stable release, and a request
   for a patch release ([#6435](https://github.com/wp-cli/wp-cli/issues/6435))
   is open with no date. Even the nightly still prints notices from its
-  bundled gettext during `i18n make-pot`. Nothing breaks: scripts that read
+  bundled gettext during `i18n make-pot`
+  ([wp-cli/i18n-command#521](https://github.com/wp-cli/i18n-command/issues/521)).
+  Checked again on 2026-11-17: no new release. Nothing breaks: scripts that read
   WP-CLI's output skip the notices, and Playground runs PHP 8.3, where they
   don't appear. Check for a new stable release; when it ships, update and
   see whether the notices are gone.
@@ -81,15 +83,6 @@ small changes.
   changed string drops its translations in every language. In this theme the
   `style.css` headers (Theme Name, Description, Author, URIs) are translated
   strings too.
-
-## Camptix Badge Generator, now CampTix Badge Designer (October 2026)
-
-A plugin that turns CampTix CSV exports into printable PDF badges.
-
-- **Read Playground's PHP log from the host.** The site's files live inside
-  Playground, so `WP_DEBUG_LOG` was pointed at a path inside the mounted
-  plugin folder (`sandbox/debug.log`, ignored by Git). Warnings also reached
-  the page even with `WP_DEBUG_DISPLAY` off, and broke a CSV download.
 
 ## WordPress.tv 27 (October 2026)
 
