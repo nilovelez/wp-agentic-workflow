@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 /**
- * Checks the tools needed to develop a WordPress plugin with this skill, and
- * that the current folder is a plugin whose folder name matches its slug.
+ * Checks the tools needed to develop a WordPress plugin or theme with this
+ * skill, and that the current folder is a plugin or a theme whose folder name
+ * matches its slug.
  *
- * Usage, from the plugin repo root:
+ * Usage, from the plugin or theme repo root:
  *   node <skill>/scripts/check-env.mjs          Human-readable report.
  *   node <skill>/scripts/check-env.mjs --json   JSON report.
  *
@@ -11,8 +12,9 @@
  * It only reads: it never installs or changes anything.
  */
 import { execSync } from 'node:child_process';
-import { existsSync, readdirSync, readFileSync } from 'node:fs';
+import { existsSync } from 'node:fs';
 import path from 'node:path';
+import { findProject } from './project.mjs';
 
 const platform = process.platform; // 'win32', 'darwin' or 'linux'.
 
@@ -175,29 +177,6 @@ function findWpCli() {
 	}
 }
 
-/**
- * Looks for the main plugin file (a PHP file in the root with a
- * "Plugin Name:" header) and reads its Text Domain.
- */
-function findPlugin( folder ) {
-	const phpFiles = readdirSync( folder ).filter( ( file ) => file.endsWith( '.php' ) );
-	for ( const file of phpFiles ) {
-		// Headers live at the top of the file.
-		const head = readFileSync( path.join( folder, file ), 'utf8' ).slice( 0, 8192 );
-		const name = head.match( /^[ \t/*#@]*Plugin Name:(.*)$/mi );
-		if ( ! name ) {
-			continue;
-		}
-		const textDomain = head.match( /^[ \t/*#@]*Text Domain:(.*)$/mi );
-		return {
-			mainFile: file,
-			name: name[ 1 ].trim(),
-			textDomain: textDomain ? textDomain[ 1 ].trim() : null,
-		};
-	}
-	return null;
-}
-
 const checks = [];
 
 function addCheck( id, label, required, ok, detail ) {
@@ -251,22 +230,20 @@ addCheck( 'svn', 'Subversion', false, null !== svnVersion, svnVersion || 'not fo
 const chrome = findChrome();
 addCheck( 'chrome', 'Chrome', false, null !== chrome, chrome || 'not found (only needed for WordPress.org assets)' );
 
-// The plugin: folder name must match the slug (Text Domain).
+// The plugin or theme: folder name must match the slug (Text Domain).
 const folder = process.cwd();
 const folderName = path.basename( folder );
-const plugin = findPlugin( folder );
-const project = { folder, folderName, plugin: null, slugMatches: false };
-if ( ! plugin ) {
-	addCheck( 'plugin', 'Plugin', true, false, 'no PHP file with a "Plugin Name:" header in ' + folder );
+const found = findProject( folder );
+const project = { folder, folderName, ...found, slugMatches: false };
+if ( found.error ) {
+	addCheck( 'project', 'Project', true, false, found.error );
 } else {
-	project.plugin = plugin;
-	const slug = plugin.textDomain || path.basename( plugin.mainFile, '.php' );
-	project.slugMatches = slug === folderName;
-	let detail = plugin.mainFile + ', Text Domain: ' + ( plugin.textDomain || '(missing)' );
+	project.slugMatches = found.slug === folderName;
+	let detail = `${ found.type } "${ found.name }", ${ found.mainFile }, Text Domain: ${ found.textDomain || '(missing)' }`;
 	if ( ! project.slugMatches ) {
-		detail += ' -- the folder is "' + folderName + '" but the slug is "' + slug + '": rename the folder';
+		detail += ' -- the folder is "' + folderName + '" but the slug is "' + found.slug + '": rename the folder';
 	}
-	addCheck( 'plugin', 'Plugin', true, project.slugMatches, detail );
+	addCheck( 'project', 'Project', true, project.slugMatches, detail );
 }
 
 const ready = checks.every( ( check ) => check.ok || ! check.required );

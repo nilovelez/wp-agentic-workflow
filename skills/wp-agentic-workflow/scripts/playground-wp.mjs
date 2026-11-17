@@ -33,7 +33,8 @@
  * path comes from `wp --info`.
  */
 import { spawnSync } from 'node:child_process';
-import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
+import { findProject } from './project.mjs';
 import os from 'node:os';
 import path from 'node:path';
 
@@ -90,20 +91,6 @@ function findWpCliPhar() {
 }
 
 /**
- * Returns true if the folder has a root PHP file with a "Plugin Name:" header.
- */
-function isPlugin( folder ) {
-	const phpFiles = readdirSync( folder ).filter( ( file ) => file.endsWith( '.php' ) );
-	for ( const file of phpFiles ) {
-		const head = readFileSync( path.join( folder, file ), 'utf8' ).slice( 0, 8192 );
-		if ( /^[ \t/*#@]*Plugin Name:/mi.test( head ) ) {
-			return true;
-		}
-	}
-	return false;
-}
-
-/**
  * Runs the Playground CLI with the given arguments, showing its output, and
  * returns its exit code. On Windows `npx` is a .cmd file, which needs a
  * shell; arguments are quoted for it. Elsewhere no shell is used, so the
@@ -123,8 +110,12 @@ function playground( args ) {
 
 const repo = process.cwd();
 const slug = path.basename( repo );
-if ( ! isPlugin( repo ) ) {
-	fail( `${ repo } is not a plugin: no PHP file with a "Plugin Name:" header. Run this from the plugin repo root.` );
+const project = findProject( repo );
+if ( project.error ) {
+	fail( project.error + '. Run this from the plugin repo root.' );
+}
+if ( 'plugin' !== project.type ) {
+	fail( `${ repo } is a theme: this script doesn't support themes yet.` );
 }
 
 const phar = findWpCliPhar();

@@ -17,7 +17,8 @@
  *   studio start --path <site> --skip-browser
  */
 import { spawnSync } from 'node:child_process';
-import { existsSync, readdirSync, readFileSync, symlinkSync } from 'node:fs';
+import { existsSync, symlinkSync } from 'node:fs';
+import { findProject } from './project.mjs';
 import os from 'node:os';
 import path from 'node:path';
 
@@ -47,21 +48,6 @@ function studio( args ) {
 	}
 }
 
-/**
- * Returns the plugin name from the "Plugin Name:" header of a root PHP file.
- */
-function findPluginName( folder ) {
-	const phpFiles = readdirSync( folder ).filter( ( file ) => file.endsWith( '.php' ) );
-	for ( const file of phpFiles ) {
-		const head = readFileSync( path.join( folder, file ), 'utf8' ).slice( 0, 8192 );
-		const name = head.match( /^[ \t/*#@]*Plugin Name:(.*)$/mi );
-		if ( name ) {
-			return name[ 1 ].trim();
-		}
-	}
-	return null;
-}
-
 const repo = process.cwd();
 const slug = path.basename( repo );
 const sitesDir = path.resolve( getOption( '--sites-dir', path.join( os.homedir(), 'Studio' ) ) );
@@ -69,11 +55,16 @@ const php = getOption( '--php', '8.3' );
 const site = path.join( sitesDir, slug );
 const domain = `${ slug }.local`;
 
-const name = findPluginName( repo );
-if ( ! name ) {
-	console.error( `No PHP file with a "Plugin Name:" header in ${ repo }. Run this from the plugin repo root.` );
+const project = findProject( repo );
+if ( project.error ) {
+	console.error( project.error + '. Run this from the plugin repo root.' );
 	process.exit( 1 );
 }
+if ( 'plugin' !== project.type ) {
+	console.error( `${ repo } is a theme: this script doesn't support themes yet.` );
+	process.exit( 1 );
+}
+const name = project.name;
 if ( existsSync( site ) ) {
 	console.error( `${ site } already exists. Use that site, or delete it first (studio delete --path "${ site }").` );
 	process.exit( 1 );
