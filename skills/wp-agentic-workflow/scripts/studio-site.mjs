@@ -1,16 +1,16 @@
 #!/usr/bin/env node
 /**
- * Creates the persistent Studio test site for the plugin in the current
- * folder, with the plugin linked from the repo (not copied).
+ * Creates the persistent Studio test site for the plugin or theme in the
+ * current folder, with the plugin or theme linked from the repo (not copied).
  *
- * Usage, from the plugin repo root:
+ * Usage, from the plugin or theme repo root:
  *   node <skill>/scripts/studio-site.mjs [--sites-dir <dir>] [--php <version>]
  *
  * - Site folder: <sites-dir>/<slug> (default sites dir: ~/Studio).
  * - Domain: <slug>.local. Login: admin / password, the same as Playground.
  * - If the repo has a blueprint.json, Studio applies it when creating the
- *   site. Its step that activates this plugin does nothing at that point
- *   (the plugin is linked afterwards), so the plugin is activated here.
+ *   site. Its step that activates this plugin or theme does nothing at that
+ *   point (it is linked afterwards), so it is activated here.
  *
  * The site is created but not started: starting it adds the domain to the
  * hosts file, which asks for confirmation (UAC on Windows). Start it with:
@@ -57,13 +57,11 @@ const domain = `${ slug }.local`;
 
 const project = findProject( repo );
 if ( project.error ) {
-	console.error( project.error + '. Run this from the plugin repo root.' );
+	console.error( project.error + '. Run this from the plugin or theme repo root.' );
 	process.exit( 1 );
 }
-if ( 'plugin' !== project.type ) {
-	console.error( `${ repo } is a theme: this script doesn't support themes yet.` );
-	process.exit( 1 );
-}
+// Where WordPress looks for it: wp-content/plugins/ or wp-content/themes/.
+const contentFolder = 'theme' === project.type ? 'themes' : 'plugins';
 const name = project.name;
 if ( existsSync( site ) ) {
 	console.error( `${ site } already exists. Use that site, or delete it first (studio delete --path "${ site }").` );
@@ -71,7 +69,7 @@ if ( existsSync( site ) ) {
 }
 
 // 1. Create the site, applying the repo's blueprint if there is one.
-//    --file-access all-files: the plugin is a link to a folder outside the site.
+//    --file-access all-files: the plugin or theme is a link to a folder outside the site.
 //    --admin-password: otherwise Studio generates a random one.
 const createArgs = [
 	'create',
@@ -91,14 +89,14 @@ if ( existsSync( blueprint ) ) {
 }
 studio( createArgs );
 
-// 2. Link the plugin from the repo. On Windows a junction, which needs no
+// 2. Link the plugin or theme from the repo. On Windows a junction, which needs no
 //    admin rights; elsewhere a symbolic link.
-const link = path.join( site, 'wp-content', 'plugins', slug );
+const link = path.join( site, 'wp-content', contentFolder, slug );
 symlinkSync( repo, link, 'win32' === process.platform ? 'junction' : 'dir' );
 console.log( `\nLinked ${ link } -> ${ repo }` );
 
 // 3. Activate it.
-studio( [ 'wp', '--path', site, 'plugin', 'activate', slug ] );
+studio( [ 'wp', '--path', site, project.type, 'activate', slug ] );
 
 console.log( `
 Site created at ${ site }, not started yet.

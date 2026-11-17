@@ -1,15 +1,15 @@
 #!/usr/bin/env node
 /**
- * Runs WP-CLI on a Playground site, or Plugin Check on the release zip,
- * without starting a web server. It uses the Playground CLI's `php` command:
+ * Runs WP-CLI on a Playground site, or Plugin Check or Theme Check on the
+ * release zip, without starting a web server. It uses the Playground CLI's `php` command:
  * it builds a WordPress site, runs one PHP script in it (here, WP-CLI's
  * .phar, mounted from this computer) and exits.
  *
- * Usage, from the plugin repo root:
+ * Usage, from the plugin or theme repo root:
  *
  *   node <skill>/scripts/playground-wp.mjs [options] -- <wp-cli arguments>
  *     WP-CLI on a disposable site built from the repo's blueprint.json, with
- *     the plugin mounted from the repo. Nothing is kept afterwards.
+ *     the plugin or theme mounted from the repo. Nothing is kept afterwards.
  *     Example: node playground-wp.mjs -- plugin list
  *
  *   node <skill>/scripts/playground-wp.mjs --site <folder> [options] -- <wp-cli arguments>
@@ -22,11 +22,15 @@
  *     Builds the release zip with `git archive HEAD`, extracts it into a
  *     temporary folder and runs Plugin Check on it, on a disposable site.
  *
+ *   node <skill>/scripts/playground-wp.mjs --theme-check [--temp <folder>] [-- <extra theme-check arguments>]
+ *     The same for a theme, with Theme Check (`wp theme-check run`). Its
+ *     exit code is 1 when there is any REQUIRED item.
+ *
  * Options:
  *   --blueprint <file>  Blueprint to use instead of ./blueprint.json.
  *   --php <version>     PHP version (the blueprint's preferredVersions wins).
  *   --wp <version>      WordPress version (the same).
- *   --temp <folder>     Where --plugin-check puts the zip (default: the
+ *   --temp <folder>     Where the checks put the zip (default: the
  *                       system's temporary folder).
  *
  * Needs WP-CLI installed as a .phar (see references/environment.md): its
@@ -112,10 +116,17 @@ const repo = process.cwd();
 const slug = path.basename( repo );
 const project = findProject( repo );
 if ( project.error ) {
-	fail( project.error + '. Run this from the plugin repo root.' );
+	fail( project.error + '. Run this from the plugin or theme repo root.' );
 }
-if ( 'plugin' !== project.type ) {
-	fail( `${ repo } is a theme: this script doesn't support themes yet.` );
+// Where WordPress looks for it: wp-content/plugins/ or wp-content/themes/.
+const contentFolder = 'theme' === project.type ? 'themes' : 'plugins';
+
+// Plugin Check is for plugins and Theme Check for themes.
+if ( ownArgs.includes( '--plugin-check' ) && 'plugin' !== project.type ) {
+	fail( `${ project.name } is a theme: use --theme-check.` );
+}
+if ( ownArgs.includes( '--theme-check' ) && 'theme' !== project.type ) {
+	fail( `${ project.name } is a plugin: use --plugin-check.` );
 }
 
 const phar = findWpCliPhar();
@@ -135,11 +146,12 @@ if ( wp ) {
 }
 const wpCli = [ '--', '/tools/wp-cli/' + path.basename( phar ), '--path=/wordpress' ];
 
-// Plugin Check on the extracted release zip.
-if ( ownArgs.includes( '--plugin-check' ) ) {
+// Plugin Check or Theme Check on the extracted release zip.
+if ( ownArgs.includes( '--plugin-check' ) || ownArgs.includes( '--theme-check' ) ) {
+	const checker = 'theme' === project.type ? 'theme-check' : 'plugin-check';
 	const tempBase = getOption( '--temp', os.tmpdir() );
 	mkdirSync( tempBase, { recursive: true } );
-	const temp = mkdtempSync( path.join( tempBase, slug + '-plugin-check-' ) );
+	const temp = mkdtempSync( path.join( tempBase, slug + '-' + checker + '-' ) );
 
 	// A tar archive, not a zip: `tar` can extract it on Windows, macOS and Linux.
 	const archive = path.join( temp, slug + '.tar' );
@@ -152,27 +164,38 @@ if ( ownArgs.includes( '--plugin-check' ) ) {
 		fail( 'Could not extract ' + archive );
 	}
 
-	// A blueprint that only installs Plugin Check.
+	// A blueprint that only installs the checker plugin from WordPress.org.
 	const blueprint = path.join( temp, 'blueprint.json' );
 	writeFileSync( blueprint, JSON.stringify( {
 		steps: [
 			{
 				step: 'installPlugin',
-				pluginData: { resource: 'wordpress.org/plugins', slug: 'plugin-check' },
+				pluginData: { resource: 'wordpress.org/plugins', slug: checker },
 				options: { activate: true },
 			},
 		],
 	}, null, '\t' ) );
 
-	console.log( `Plugin Check on the release (git archive HEAD), extracted in ${ temp }\n` );
-	const status = playground( [
-		'--blueprint', blueprint,
-		'--mount-dir', path.join( temp, slug ), '/release/' + slug,
-		...commonArgs,
-		...wpCli,
-		'plugin', 'check', '/release/' + slug, '--include-experimental',
-		...wpArgs,
-	] );
+	// Plugin Check takes a path; Theme Check, the slug of an installed theme,
+	// so the theme is mounted where WordPress looks for themes.
+	let checkArgs;
+	if ( 'plugin-check' === checker ) {
+		checkArgs = [
+			'--mount-dir', path.join( temp, slug ), '/release/' + slug,
+			...commonArgs, ...wpCli,
+			'plugin', 'check', '/release/' + slug, '--include-experimental',
+		];
+	} else {
+		checkArgs = [
+			'--mount-dir', path.join( temp, slug ), '/wordpress/wp-content/themes/' + slug,
+			...commonArgs, ...wpCli,
+			'theme-check', 'run', slug,
+		];
+	}
+
+	const checkerName = 'plugin-check' === checker ? 'Plugin Check' : 'Theme Check';
+	console.log( `${ checkerName } on the release (git archive HEAD), extracted in ${ temp }\n` );
+	const status = playground( [ '--blueprint', blueprint, ...checkArgs, ...wpArgs ] );
 	rmSync( temp, { recursive: true, force: true } );
 	process.exit( status );
 }
@@ -183,7 +206,7 @@ if ( 0 === wpArgs.length ) {
 
 const blueprintFile = path.resolve( getOption( '--blueprint', 'blueprint.json' ) );
 const hasBlueprint = existsSync( blueprintFile );
-const pluginMount = [ '--mount-dir', repo, '/wordpress/wp-content/plugins/' + slug ];
+const repoMount = [ '--mount-dir', repo, `/wordpress/wp-content/${ contentFolder }/${ slug }` ];
 const site = getOption( '--site', null );
 
 let siteArgs;
@@ -213,4 +236,4 @@ if ( ! site ) {
 	}
 }
 
-process.exit( playground( [ ...siteArgs, ...pluginMount, ...commonArgs, ...wpCli, ...wpArgs ] ) );
+process.exit( playground( [ ...siteArgs, ...repoMount, ...commonArgs, ...wpCli, ...wpArgs ] ) );
