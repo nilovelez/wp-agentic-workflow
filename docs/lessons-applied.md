@@ -216,6 +216,12 @@ small changes.
 - **`.gitattributes` for a theme:** don't export-ignore `screenshot.png`
   (the theme needs it); `/.github` and `/guppy` go out of the zip too.
   → `templates/gitattributes` (`screenshot.png` note, `/.github`). `/guppy` is the developer's own and stays out of the template.
+- **Don't export-ignore `assets/` in a theme.** In a theme, `assets/` is a
+  regular theme folder (CSS, JS, fonts, images), and themes have no SVN
+  assets folder. Intentionally Blank ships `assets/css/` in its zip;
+  applying the template would drop it. The rule in `release.md` ("`assets/`
+  is reserved for the WordPress.org images") is plugin-only.
+  → `templates/gitattributes` (the `assets` lines marked as plugin-only), `release.md`, `SKILL.md` (Themes). Checked: Twenty Twenty-Three, Twenty Twenty-Four and Twenty Twenty-Five all ship an `assets/` folder.
 - **Plugin Check doesn't apply.** The theme equivalent is the Theme Check
   plugin (`theme-check`); the skill doesn't cover it yet. (This particular
   theme is flagged as a special case in the WordPress.org theme directory and

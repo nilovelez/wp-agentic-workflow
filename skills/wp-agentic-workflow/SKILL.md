@@ -17,7 +17,7 @@ Everything in this skill applies to themes too: where it says "plugin", read "pl
 - A theme is mounted or linked into `wp-content/themes/<slug>`, not `plugins/`. The scripts do it.
 - Its blueprint template is `templates/blueprint-theme.json`: it activates the theme and opens the front page.
 - Its release check is Theme Check (`playground-wp.mjs --theme-check`), not Plugin Check (`references/quality.md`).
-- `screenshot.png` is part of the theme: it goes in the zip.
+- `screenshot.png` and `assets/` are part of the theme: both go in the zip (the template's `assets` lines in `.gitattributes` are for plugins, see `references/release.md`).
 - For how to write the theme itself (`theme.json`, templates, patterns), follow the official `wp-block-themes` skill.
 
 ## WordPress standards

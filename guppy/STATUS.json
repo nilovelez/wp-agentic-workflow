@@ -4,8 +4,8 @@
   "description": "Public Claude Code skill that sets up and guides a WordPress plugin development workflow, from local test sites to WordPress.org submission.",
   "status": "active",
   "status_text": "The skill now covers WordPress themes as well as plugins, with Theme Check; theme releases on WordPress.org are not covered yet. Next: a plugin started from scratch.",
-  "last_update": "2026-11-17 19:41:59 +0100",
-  "last_update_unix": 1794940919,
+  "last_update": "2026-11-17 22:03:06 +0100",
+  "last_update_unix": 1794949386,
   "url": "https://github.com/nilovelez/wp-agentic-workflow",
   "status_url": "https://raw.githubusercontent.com/nilovelez/wp-agentic-workflow/main/guppy/STATUS.md",
   "icon": null

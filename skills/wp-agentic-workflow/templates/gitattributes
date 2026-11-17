@@ -19,5 +19,8 @@
 /composer.json   export-ignore
 /composer.lock   export-ignore
 /phpcs.xml.dist  export-ignore
+
+# Plugins only: the WordPress.org images and their sources (see release.md).
+# In a theme, assets/ is a regular theme folder: remove these two lines.
 /assets          export-ignore
 /assets-src      export-ignore

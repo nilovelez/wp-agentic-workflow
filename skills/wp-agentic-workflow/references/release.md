@@ -1,6 +1,6 @@
 # Release and WordPress.org
 
-This covers plugins. For a theme, the zip, `.gitattributes` and the translated strings work the same way; its submission and review on WordPress.org are different and not covered yet.
+This covers plugins. For a theme, the zip and the translated strings work the same way, and `.gitattributes` too, except for `assets/` (see below); its submission and review on WordPress.org are different and not covered yet.
 
 ## The repo holds the plugin and its development files
 
@@ -15,7 +15,9 @@ To ship only part of an ignored folder, ignore the folder and then un-ignore wha
 /resources/icons/arrow.svg -export-ignore
 ```
 
-`assets/` is reserved for the WordPress.org images (see below) and always `export-ignore`d, even for a plugin that is only on GitHub today: it may go to the directory later. Files the plugin uses at runtime (icons, images, fonts) go in another folder, such as `resources/`.
+In a plugin, `assets/` is reserved for the WordPress.org images (see below) and always `export-ignore`d, even for a plugin that is only on GitHub today: it may go to the directory later. Files the plugin uses at runtime (icons, images, fonts) go in another folder, such as `resources/`.
+
+In a theme, `assets/` is a regular theme folder (CSS, JS, fonts, images), as in the default themes: themes have no SVN assets folder, and their only directory image is `screenshot.png`. Remove the template's `assets` lines, or the folder is left out of the zip and the theme breaks.
 
 ## Translations
 
