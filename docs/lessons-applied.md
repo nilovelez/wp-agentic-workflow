@@ -8,6 +8,21 @@ WordPress development with Claude. Newest project first.
 Lessons that were reviewed and left out of the skill are at the end, with
 the reason.
 
+## A pull request to the WordPress.org Meta repository (November 2026)
+
+Adding Photo Directory activity to WordPress.org profiles, in a partial
+clone of `WordPress/wordpress.org` (`--filter=blob:none --sparse --depth 1`;
+the repository is very large). The contribution goes through a pull request
+from a fork, linked to a Meta Trac ticket.
+
+- **Projects with their own tooling keep it.** The repository has its own
+  wp-env environments, PHPUnit suites and PHPCS setup; the skill's templates
+  (blueprint, `composer.json`) don't apply. Its `composer run lint` reports
+  every existing error in a file, so for a change to older files use the
+  project's `composer run phpcs-changed`, which checks only the changed lines
+  (new files need `git add -N` to be seen).
+  → `SKILL.md` (a project's own tooling, generalized from wp-env), `quality.md` (check only the changed lines in a project that isn't yours). The `git add -N` detail is left out: it belongs to that tool.
+
 ## Themes in the skill (November 2026)
 
 - **`studio create --no-start` without a blueprint doesn't install
@@ -925,6 +940,25 @@ releasing on GitHub and WordPress.org, with the developer away.
   readme, Claude over-corrected and removed too much.
   *(Classic Honeypot for CF7 (October 2026))*
 
+### General git, not the WordPress workflow.
+
+- **`git grep` on a commit in a partial clone downloads every blob.** Like
+  `git log -S`, `git grep <pattern> HEAD -- <path>` has to read the files
+  that aren't checked out, so it fetches them one by one; it ran for over 10
+  minutes and had to be stopped. To find files, use `git ls-tree -r
+  --name-only HEAD | grep`, which reads only the tree, then add the folders
+  to the sparse checkout with `git sparse-checkout add` and search them on
+  disk. Adding a single file needs `--skip-checks`.
+  *(A pull request to the WordPress.org Meta repository (November 2026))*
+- **Clone the fork, or set up the remotes before starting.** The repository
+  was cloned from `WordPress/wordpress.org`, so `origin` pointed to the
+  upstream repository. The fix, before any commit: rename it to `upstream`
+  (the partial clone settings move with it, so missing blobs keep coming from
+  there), add the fork as `origin`, and block pushes to upstream with `git
+  remote set-url --push upstream DISABLED`. A fork whose default branch is at
+  the same commit as upstream accepts pushes from a shallow clone.
+  *(A pull request to the WordPress.org Meta repository (November 2026))*
+
 ### Setup of the developer's own computers.
 
 - **Studio's default sites folder can be changed in the app, but
@@ -944,6 +978,15 @@ releasing on GitHub and WordPress.org, with the developer away.
   reason. `gh auth login --insecure-storage` keeps the token in
   `~/.config/gh/hosts.yml` instead, and `gh auth setup-git` makes Git use it.
   *(Moving to macOS (November 2026))*
+- **Check the git identity and the active `gh` account before committing.**
+  The computer's global git identity and the logged-in `gh` account were not
+  the developer's. In WordPress.org repositories this matters beyond the
+  author line: Props Bot credits the commit authors and the people in the
+  pull request. Set the identity in the repository only (`git config
+  user.name` and `user.email`), and switch `gh` with `gh auth login` or `gh
+  auth switch`; when git's credential helper for github.com is `gh auth
+  git-credential`, the push uses the active `gh` account.
+  *(A pull request to the WordPress.org Meta repository (November 2026))*
 
 ### Part of the story, not a rule.
 

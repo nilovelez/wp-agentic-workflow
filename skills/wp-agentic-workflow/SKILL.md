@@ -6,7 +6,7 @@ compatibility: "WordPress plugins and themes (theme releases on WordPress.org no
 
 # WordPress plugin workflow
 
-One way of developing a WordPress plugin, the same on every project, from the first line of code to WordPress.org. It follows what WordPress officially recommends at the moment (Playground, Blueprints, Studio, WP-CLI, the WordPress Coding Standards, Plugin Check) and builds on the official skills from [WordPress/agent-skills](https://github.com/WordPress/agent-skills); this skill only adds the glue between them and a few opinions. Don't set up or suggest wp-env: it needs Docker, and Playground and Studio cover the same without it. If a project already uses wp-env (its own scripts, its test suite), that is the project's choice: use it as it is.
+One way of developing a WordPress plugin, the same on every project, from the first line of code to WordPress.org. It follows what WordPress officially recommends at the moment (Playground, Blueprints, Studio, WP-CLI, the WordPress Coding Standards, Plugin Check) and builds on the official skills from [WordPress/agent-skills](https://github.com/WordPress/agent-skills); this skill only adds the glue between them and a few opinions. Don't set up or suggest wp-env: it needs Docker, and Playground and Studio cover the same without it. If a project already has its own tooling (wp-env, a test suite, its own PHPCS setup), that is the project's choice: use it as it is, and don't add this skill's templates on top of it.
 
 `<skill>` below is the folder of this skill.
 

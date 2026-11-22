@@ -31,6 +31,8 @@ Fix the code, don't silence the rule. When a rule must be ignored, ignore that o
 
 For a block, name the sniff in both `phpcs:disable` and `phpcs:enable`. A bare `// phpcs:enable` turns every rule back on, including those disabled elsewhere in the file.
 
+In a project that isn't yours, with errors in code you didn't write, check only the lines you change (the project's own command if it has one, such as `phpcs-changed`), and leave the other errors alone: fixing them makes the pull request harder to review.
+
 ## Plugin Check
 
 The official tool of the WordPress.org plugin review team. Run it on what reviewers will get, the release zip, not on the repo: on the repo folder (including the plugin linked into the Studio site) it also flags development files (`.git`, `.claude`, `.github`, `vendor/`, `CLAUDE.md`, extra Markdown files, untracked folders) that never reach the zip.
