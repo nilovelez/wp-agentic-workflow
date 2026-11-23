@@ -11,6 +11,28 @@ reason.
 
 ## Themes in the skill (November 2026)
 
+- **WordPress/wordpress-playground#4615 is fixed in Playground CLI 3.1.66**
+  (2026-11-23), which includes #4621 ("Await defineConstant in the login
+  step") and #4675 ("Write boot constants only once per Playground server").
+  Retested from Intentionally Blank with the default 6 workers; Nilo closed
+  the issue with these results:
+  - The issue's blueprint (`login` + `defineWpConfigConsts`, default
+    method), 12 starts each: on 3.1.65, `consts.json` was invalid in 9 and
+    every start lost `SQLITE_JOURNAL_MODE` and ended in WAL; on 3.1.66, 0
+    of 12.
+  - The theme's blueprint without `rewrite-wp-config`, theme mounted, 6
+    starts each: on 3.1.65, `WP_DEBUG` was false in 4 and all 6 ended in
+    WAL; on 3.1.66, 0 of 6.
+
+  So the rule that every `defineWpConfigConsts` uses
+  `"method": "rewrite-wp-config"` (`references/playground.md`, the blueprint
+  templates) is only needed up to 3.1.65, unless the skill keeps it for
+  another reason (WP-CLI only sees constants written to `wp-config.php`).
+  To decide at review. Testing trap: on 3.1.66 the auto-login cookies are
+  set after a redirect, so a check that reads cookies only from the first
+  response wrongly reports that auto-login failed; follow redirects with a
+  cookie jar.
+
 - **To check: Plugin Check 2.2.0 prints a PHP deprecation notice.** Running
   `playground-wp.mjs --plugin-check` on Classic Honeypot for CF7 printed
   `Deprecated: trim(): Passing null to parameter #1 ($string) of type string
