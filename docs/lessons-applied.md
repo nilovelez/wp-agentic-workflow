@@ -77,6 +77,17 @@ Playground CLI 3.1.65, WP-CLI 2.12.0 and Classic Honeypot for CF7.
   the default way: they live in Playground's `consts.json`, not in
   `wp-config.php`, so the stored site had `WP_DEBUG` false.
   → `playground.md`, `templates/blueprint.json`
+  Corrected in November 2026, with Playground CLI 3.1.66: on a disposable
+  site WP-CLI sees them with either method. What loses them is a persistent
+  site: `consts.json` lives in Playground's internal folder, created again on
+  every run, and the blueprint only runs when the site is created. With the
+  default method, `SCRIPT_DEBUG` was true when the site was created and false
+  on the next run; with `rewrite-wp-config` it stayed true, written in the
+  site's `wp-config.php`. `WP_DEBUG`, `WP_DEBUG_LOG` and `WP_DEBUG_DISPLAY`
+  came out with the blueprint's values on both runs, though the site's
+  `wp-config.php` said `WP_DEBUG` false: the CLI seems to set them on its own,
+  so they can't show the problem.
+  → `playground.md` (the `rewrite-wp-config` rule now gives this reason; WP-CLI: check with `SCRIPT_DEBUG`). With #4615 fixed, this is why the templates keep `rewrite-wp-config`.
 - **With `"method": "rewrite-wp-config"` the constants do reach WP-CLI.**
   `wp eval 'var_dump( WP_DEBUG );'` showed them true, but `wp config get
   WP_DEBUG` said it wasn't defined in `wp-config.php`, though the file had
