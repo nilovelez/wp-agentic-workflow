@@ -205,6 +205,7 @@ small changes.
   Then `defineWpConfigConsts` alone was blamed, until the minimal
   reproduction without `login` came out clean.
   → `templates/blueprint.json`, `playground.md`; reported as WordPress/wordpress-playground#4615
+  Fixed in Playground CLI 3.1.66 (#4621 and #4675), retested in November 2026 by the Intentionally Blank session and the issue closed: with the default method, 0 of 12 starts broke `consts.json` (9 of 12 on 3.1.65). `playground.md` now gives `rewrite-wp-config` for its own reason (constants WP-CLI can see) and #4615 as history for older versions.
 - **Log in through the site's own URL.** A Playground started with
   `--site-url http://<address>:<port>` sets its cookies for that host. Going
   to `http://127.0.0.1:<port>/wp-login.php` posts the form, but the session

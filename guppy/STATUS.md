@@ -18,6 +18,7 @@ Written on macOS and not yet tested on Windows (there is no Windows machine at h
 
 Newest entries first. One per work session, brief.
 
+- 2026-11-23: WordPress/wordpress-playground#4615 fixed in Playground CLI 3.1.66 (retested by the Intentionally Blank session, issue closed). `playground.md` keeps `rewrite-wp-config` for its own reason, constants visible to WP-CLI, and describes the bug as history up to 3.1.65.
 - 2026-11-22: lessons from a pull request to the WordPress.org Meta repository reviewed. A project's own tooling (wp-env, tests, PHPCS setup) is kept and the templates aren't added on top (`SKILL.md`); in a project that isn't yours, only the changed lines are checked (`quality.md`). The git lessons went to "Reviewed, not in the skill". The #4615 retest on the next Playground CLI release is left to the Intentionally Blank session.
 - 2026-11-18: skill reviewed again. Theme notes added where the text still read as plugin-only (theme translations API and `load_theme_textdomain()`, Theme Check in the standards, themes validated only on macOS). Child themes noted as a pending test.
 - 2026-11-17: a theme's `assets/` goes in its zip: the template's `assets` lines are marked as plugin-only (`templates/gitattributes`, `release.md`, `SKILL.md`). Lesson from Intentionally Blank, checked against the default themes.
